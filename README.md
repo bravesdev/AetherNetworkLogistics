@@ -1,5 +1,5 @@
-```python
-giant_readme = """# Aether Network  — Documentação Técnica Global do Ecossistema
+
+# Aether Network  — Documentação Técnica Global do Ecossistema
 //Documentação de Engenharia de Sistemas e Arquitetura de Software
 
 ---
