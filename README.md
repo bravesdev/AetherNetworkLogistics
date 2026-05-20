@@ -6,7 +6,7 @@
 
 ## 1. INTRODUÇÃO E VISÃO GERAL DO ECOSSISTEMA
 
-O **Ecossistema Aether** é uma suite de software corporativa desenvolvida em C# (.NET Framework 4.8 / .NET 6.0) com foco em Windows Forms, projetada especificamente para suprir as necessidades críticas de monitorização de infraestrutura de TI, triagem automatizada de falhas de hardware, gestão de conectividade e resiliência de dados em redes de alta densidade. 
+O **Ecossistema Aether** é uma suite de software corporativa desenvolvida em C# (.NET 10) com foco em Windows Forms, projetada especificamente para suprir as necessidades críticas de monitorização de infraestrutura de TI, triagem automatizada de falhas de hardware, gestão de conectividade e resiliência de dados em redes de alta densidade. 
 
 ---
 
