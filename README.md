@@ -98,7 +98,7 @@ namespace aether
         {
             InitializeComponent();
             ConfigurarInterfaceCustom();
-            this.Text = $"Aether Hub - Cloud Login";
+            this.Text = $"welabs - Cloud Login";
         }
 
         private void ConfigurarInterfaceCustom()
