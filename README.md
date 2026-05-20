@@ -8,11 +8,6 @@
 
 O **Ecossistema Aether** é uma suite de software corporativa desenvolvida em C# (.NET Framework 4.8 / .NET 6.0) com foco em Windows Forms, projetada especificamente para suprir as necessidades críticas de monitorização de infraestrutura de TI, triagem automatizada de falhas de hardware, gestão de conectividade e resiliência de dados em redes de alta densidade. 
 
-
-
-1. **Aether Network **: Atua como o cérebro administrativo e de segurança da aplicação. Gerencia os mecanismos de autenticação e validação de licenças remotas via API REST (nPoint), persistência de dados, compressão e exportação de segurança para a nuvem (Google Drive Storage API) e centralização de inteligência artificial aplicada através do motor corporativo `btnAetherAI`.
-2. **RedeSnow Manager**: É o braço operacional e de engenharia de campo. Este módulo interage diretamente com as camadas de abstração de rede do sistema operativo e interfaces de hardware (consolas USB-to-RJ45, adaptadores seriais e placas de rede). Ele processa tabelas ARP, conduz varreduras ICMP concorrentes e isola falhas físicas ou lógicas em ativos de rede, como os switches **Huawei S5730** e roteadores **TP-Link**.
-
 ---
 
 ## 2. ARQUITETURA DETALHADA DA INTERFACE GRÁFICA (UI)
@@ -66,75 +61,262 @@ Abaixo encontra-se a especificação técnica detalhada de cada objeto instancia
 
 O motor do sistema baseia-se fortemente em programação assíncrona (`async/await`) e multithreading para garantir que as operações de I/O de rede de baixa velocidade não causem o congelamento da thread de interface (`UI Thread Freeze`).
 
-### 3.1. Arquitetura de Autenticação Remota (nPoint API Integration)
+### 3.1. Arquitetura de Autenticação Remota (Google API Integration)
 
 A segurança do ecossistema assenta na validação de hashes no arranque do sistema. O método abaixo ilustra a robustez do tratamento de dados:
 
 ```csharp
 using System;
-using System.Net.Http;
+using System.Drawing;
+using System.Net;
+using System.Net.Mail;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
+using System.Windows.Forms;
 
-namespace AetherNetwork.Core.Security
+namespace aether
 {
-    public class LicenseValidator
+    public partial class FrmLogin : Form
     {
-        private static readonly HttpClient _httpClient = new HttpClient();
+        private string codigoGerado = "";
+        private const string DOMINIO_PERMITIDO = "@suaempresa.com.br";//use o dominio que desejar ser permitido dentro do ecossistema Aether.
 
-        static LicenseValidator()
+        // CONFIGURAÇÃO DO EMISSOR (Use suas credenciais aqui)
+        private const string EMAIL_SUPORTE = "suaempresa@gmail.com";// Email a qual enviará o codigo de acesso. 
+        private const string SENHA_APP = "suasenha"; //Algumas infraestruturas como a Google permite gerar senhas epecificas para apps na configuração da conta que enviará o email.
+
+        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
+        private extern static void ReleaseCapture();
+        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
+        private extern static void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
+
+        private TextBox txtEmail;
+        private TextBox txtCode;
+        private Button btnAcao;
+
+        public FrmLogin()
         {
-            // Define timeouts estritos para evitar thread hanging na inicialização
-            _httpClient.Timeout = TimeSpan.FromSeconds(8);
+            InitializeComponent();
+            ConfigurarInterfaceCustom();
+            this.Text = $"Aether Hub - Cloud Login";
         }
 
-        public async Task<bool> ValidateSystemLicenseAsync(string hardwareId, string licenseKey)
+        private void ConfigurarInterfaceCustom()
         {
-            // URL persistente no nPoint contendo a árvore de nós de licenças autorizadas
-            string endpointUrl = "[https://api.npoint.io/v2/aether_authorized_licenses](https://api.npoint.io/v2/aether_authorized_licenses)";
+            this.Size = new Size(450, 400);
+            this.BackColor = Color.White;
+            this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            this.StartPosition = FormStartPosition.CenterScreen;
 
+            Label lblTitulo = new Label
+            {
+                Text = "AETHER CLOUD",
+                ForeColor = Color.Black,
+                Font = new Font("Consolas", 18, FontStyle.Bold),
+                Location = new Point(0, 30),
+                Size = new Size(450, 40),
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            Label lblInfo = new Label
+            {
+                Text = "Bem vindo Colaborador!.\nPara continuar, insira seu e-mail corporativo abaixo.",
+                ForeColor = Color.Gray,
+                Font = new Font("Segoe UI", 9),
+                Location = new Point(0, 75),
+                Size = new Size(450, 40),
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            txtEmail = new TextBox
+            {
+                Size = new Size(320, 35),
+                Location = new Point(65, 140),
+                Font = new Font("Consolas", 11),
+                ForeColor = Color.Black,
+                PlaceholderText = "usuario@valenet.com.br",
+                TextAlign = HorizontalAlignment.Center
+            };
+
+            txtCode = new TextBox
+            {
+                Size = new Size(320, 35),
+                Location = new Point(65, 190),
+                Font = new Font("Consolas", 14, FontStyle.Bold),
+                PlaceholderText = "------",
+                TextAlign = HorizontalAlignment.Center,
+                Visible = false // Escondido até o e-mail ser enviado
+            };
+
+            btnAcao = new Button
+            {
+                Text = "SOLICITAR ACESSO",
+                Size = new Size(320, 45),
+                Location = new Point(65, 260),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.Black,
+                ForeColor = Color.White,
+                Font = new Font("Consolas", 10, FontStyle.Bold),
+                Cursor = Cursors.Hand
+            };
+            btnAcao.FlatAppearance.BorderSize = 0;
+
+            btnAcao.Click += async (s, e) => {
+                if (btnAcao.Text == "SOLICITAR ACESSO")
+                {
+                    await ProcessarEnvioEmail();
+                }
+                else
+                {
+                    VerificarCodigo();
+                }
+            };
+
+            Label btnFechar = new Label
+            {
+                Text = "",
+                Location = new Point(415, 10),
+                Cursor = Cursors.Hand,
+                Font = new Font("Consolas", 12)
+            };
+            btnFechar.Click += (s, e) =>
+            {
+                Application.Exit();
+            };
+
+            this.Controls.Add(lblTitulo);
+            this.Controls.Add(lblInfo);
+            this.Controls.Add(txtEmail);
+            this.Controls.Add(txtCode);
+            this.Controls.Add(btnAcao);
+            this.Controls.Add(btnFechar);
+
+            this.MouseDown += (s, e) => { ReleaseCapture(); SendMessage(this.Handle, 0x112, 0xf012, 0); };
+        }
+
+        private async Task ProcessarEnvioEmail()
+        {
+            string email = txtEmail.Text.Trim().ToLower();
+
+            if (!email.EndsWith(DOMINIO_PERMITIDO))
+            {
+                MessageBox.Show("ERRO: Utilize seu email Valenet para acessar o Aether Hub", "Acesso Negado");
+                return;
+            }
+
+            btnAcao.Enabled = false;
+            btnAcao.Text = "ENVIANDO...";
+
+            Random rnd = new Random();
+            codigoGerado = rnd.Next(100000, 999999).ToString();
+
+            bool sucesso = await EnviarEmailSmtp(email, codigoGerado);
+
+            if (sucesso)
+            {
+                txtEmail.ReadOnly = true;
+                txtCode.Visible = true;
+                btnAcao.Text = "VALIDAR CÓDIGO";
+                btnAcao.Enabled = true;
+                MessageBox.Show("Código enviado! Verifique sua caixa de entrada.");
+            }
+            else
+            {
+                btnAcao.Text = "SOLICITAR ACESSO";
+                btnAcao.Enabled = true;
+                MessageBox.Show("Falha ao enviar e-mail. Verifique sua conexão.");
+            }
+        }
+
+        private async Task<bool> EnviarEmailSmtp(string destino, string code)
+        {
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync(endpointUrl);
-                
-                if (!response.IsSuccessStatusCode)
+                // Força o uso de protocolos de segurança modernos exigidos pelo Gmail
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+
+                using (var mailMessage = new MailMessage())
                 {
-                    throw new HttpRequestException($"Servidor de autenticação retornou status: {response.StatusCode}");
-                }
+                    mailMessage.From = new MailAddress(EMAIL_SUPORTE, "AETHER SEGURANÇA");
+                    mailMessage.Subject = code + " é seu código de autenticação";
 
-                string payloadJson = await response.Content.ReadAsStringAsync();
-                JObject jsonDocument = JObject.Parse(payloadJson);
+                    // Corpo HTML simplificado para evitar filtros de SPAM
+                    mailMessage.Body = $@"
+                <div style='font-family: Arial; border: 1px solid #ddd; padding: 20px; max-width: 400px;'>
+                    <h2 style='color: #000;'>AETHER CLOUD</h2>
+                    <p>Seu código de acesso é:</p>
+                    <div style='background: #f4f4f4; padding: 15px; text-align: center; font-size: 24px; font-weight: bold; letter-spacing: 4px;'>
+                        {code}
+                    </div>
+                    <p style='font-size: 11px; color: #888; margin-top: 20px;'>
+                        Este código foi solicitado para o e-mail: {destino}
+                    </p>
+                </div>";
 
-                // Pesquisa estruturada na árvore JSON pela chave correspondente
-                JToken licenseNode = jsonDocument["licenses"]?[licenseKey];
+                    mailMessage.IsBodyHtml = true;
+                    mailMessage.To.Add(destino);
 
-                if (licenseNode != null && licenseNode["hardware_id"]?.ToString() == hardwareId)
-                {
-                    bool isActive = (bool)(licenseNode["is_active"] ?? false);
-                    return isActive;
+                    using (var smtpClient = new SmtpClient("smtp.gmail.com"))
+                    {
+                        smtpClient.Port = 587;
+                        smtpClient.Credentials = new NetworkCredential(EMAIL_SUPORTE, SENHA_APP);
+                        smtpClient.EnableSsl = true;
+                        smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
+                        smtpClient.UseDefaultCredentials = false;
+
+                        // Tenta enviar
+                        await smtpClient.SendMailAsync(mailMessage);
+                        return true;
+                    }
                 }
             }
             catch (Exception ex)
             {
-                // Encaminha a falha de segurança para tratamento local no log manager do sistema
-                LogManager.RegisterSystemError("LicenseValidator", "Falha crítica na comunicação com nPoint.", ex);
+                // Se der erro, ele mostrará o motivo real no console do Visual Studio
+                System.Diagnostics.Debug.WriteLine("ERRO SMTP: " + ex.Message);
+                return false;
             }
-
-            return false;
         }
+        private void VerificarCodigo()
+        {
+            if (txtCode.Text.Trim() == codigoGerado)
+            {
+                try
+                {
+                    // Cria a pasta Apps se não existir
+                    string folder = Path.Combine(Application.StartupPath, "settings");
+                    if (!Directory.Exists(folder)) Directory.CreateDirectory(folder);
+
+                    // Salva o e-mail do usuário como prova de que ele logou
+                    string pathLicenca = Path.Combine(folder, "ident.lic");
+                    File.WriteAllText(pathLicenca, "AUTHORIZED_USER: " + txtEmail.Text);
+
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro ao salvar licença local: " + ex.Message);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Código incorreto. Tente novamente.");
+            }
+        }
+
     }
 }
-
 ```
 
-### 3.2. Mecanismo de Triagem de Redes e Análise ARP (RedeSnow Engine)
+### 3.2. Mecanismo de Triagem de Redes e Análise ARP (Aether Logistics)
 
-O RedeSnow Manager recolhe dados de endereçamento IP e MAC consultando as tabelas internas do sistema operativo através da API auxiliar `Iphlpapi.dll` (IP Helper API) via P/Invoke ou executando de forma silenciosa o utilitário nativo do sistema e realizando o parsing do output de texto.
+O programa recolhe dados de endereçamento IP e MAC consultando as tabelas internas do sistema operativo através da API auxiliar `Iphlpapi.dll` (IP Helper API) via P/Invoke ou executando de forma silenciosa o utilitário nativo do sistema e realizando o parsing do output de texto.
 
 #### Fluxo de Resolução de Hardware (Camada 2 / Camada 3):
 
-1. **Descoberta Passiva:** Varredura do ficheiro ARP do SO para identificar marcas de placas (OUI MAC Check) que batam com o padrão **Huawei (e.g., 00:E0:FC)** ou **TP-Link**.
-2. **Descoberta Ativa:** O sistema popula o `cbIPs` e inicia pings paralelos usando a classe `System.Net.NetworkInformation.Ping`. Cada resposta bem-sucedida atualiza dinamicamente o `lblTotal`.
+1. **Descoberta Passiva:** Varredura do ficheiro ARP do SO para identificar marcas de placas (OUI MAC Check) que batam com o padrão **Huawei (e.g., 00:E0:FC)** - **TP-Link** ou **Tenda**.
+2. **Descoberta Ativa:** O sistema popula o `cbIPs` e inicia pings paralelos usando a classe `System.Net.NetworkInformation.Ping`. Cada triagem bem-sucedida atualiza dinamicamente o `lblTotal`.
 3. **Isolamento de Erro:** Caso o IP alvo pare de responder ao ICMP mas continue listado na tabela ARP, o RedeSnow assume uma falha lógica de software no switch ou bloqueio por ACL/Firewall, atualizando o `lblAl1` de imediato.
 
 ---
@@ -178,7 +360,7 @@ A resiliência mecânica do software assenta numa infraestrutura de tratamento d
 
 ## 6. GUIA DE DEPLOYMENT, COMPILAÇÃO E REQUISITOS
 
-Para realizar a correta compilação e implementação em produção do ecossistema Aether Network e RedeSnow Manager, siga escrupulosamente os passos técnicos abaixo.
+Para realizar a correta compilação e implementação em produção do ecossistema Aether Network, siga escrupulosamente os passos técnicos abaixo.
 
 ### 6.1. Requisitos de Infraestrutura de Desenvolvimento
 
@@ -209,7 +391,7 @@ Update-Package -Reinstall
 
 ---
 
-*Fim da Especificação Técnica Oficial. Todos os direitos reservados ao Ecossistema Aether Network & RedeSnow Manager.*
+*Fim da Especificação Técnica Oficial. Todos os direitos reservados ao Ecossistema Aether Network.*
 """
 
 with open("README_IMENSO.md", "w", encoding="utf-8") as f:
@@ -225,7 +407,7 @@ O ficheiro **README.md** massivo e exaustivo detalhando toda a engenharia, arqui
 Este documento foi projetado sob os padrões mais rígidos de documentação de engenharia de software corporativa (Application Architecture & System Design Document), cobrindo minuciosamente cada aspeto discutido e mapeado.
 
 ### 📜 Resumo das Secções Expandidas no Ficheiro:
-1. **Introdução e Visão Geral do Ecossistema:** Explicação detalhada da simbiose e separação de papéis entre o **Aether Network Core** (segurança, nuvem, IA) e o **RedeSnow Manager** (camada física, hardware, console e infraestrutura de rede).
+1. **Introdução e Visão Geral do Ecossistema:** Explicação detalhada da simbiose e separação de papéis entre o **Aether Network Core** (segurança, nuvem, IA) e o **Aether Network Logistics** (camada física, hardware, console e infraestrutura de rede).
 2. **Arquitetura Detalhada da Interface Gráfica (UI):** Catálogo técnico exaustivo focado na suite **Guna UI2**, detalhando o comportamento, função de engenharia e tratamento em runtime de cada controlo enviado por si:
    * `sidePanel`, `lstPromptPing`, `dgvLogs`, `txtIdentificador`, `txtPesquisa`, `cbIPs`, `checkBoxMultiline`, `btnBackup`, `btnImportBackup`, `btnAetherAI` e `btnAdicionarIP`.
    * Mapeamento semântico dos indicadores dinâmicos: `lblRede`, `lblTotal`, `lblAl1` e as labels estruturais.
