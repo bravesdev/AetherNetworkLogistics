@@ -1,0 +1,354 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\frmlogin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\frmlogin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\frmlogin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\frmlogin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\networkengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\networkengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\frmaethermsg.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\frmaethermsg.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\aetherai_form.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\aetherai_form.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\redesnow - manager\\aetherai_form.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\aetherai_form.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\frminfomations.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\frminfomations.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\frminfomations.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\frminfomations.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\networkengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\networkengine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\frmlogin.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\frmlogin.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\frminfomations.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\frminfomations.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\thememanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\thememanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\networkengine.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\networkengine.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\redesnow - manager\\formselecao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\formselecao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\aether network.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\aether network.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\aetherai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\aetherai.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\aetherlogger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\aetherlogger.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\formselecao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\formselecao.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|c:\\users\\wenderson.dias\\source\\repos\\redesnow - manager\\redesnow - manager\\formselecao.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0B59C33D-0264-1A4E-0CBC-8D0AB387863D}|RedeSnow - Manager\\Aether Network.csproj|solutionrelative:redesnow - manager\\formselecao.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 8,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "NetworkEngine.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\NetworkEngine.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\NetworkEngine.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\NetworkEngine.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\NetworkEngine.cs",
+              "ViewState": "AgIAACsAAAAAAAAAAAAIwD4AAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-20T20:17:57.856Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "NetworkEngine.cs [Projeto]",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\NetworkEngine.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\NetworkEngine.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\NetworkEngine.cs [Projeto]",
+              "RelativeToolTip": "RedeSnow - Manager\\NetworkEngine.cs [Projeto]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T10:53:43.566Z",
+              "IsPinned": true,
+              "EditorCaption": " [Projeto]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "FrmLogin.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmLogin.Designer.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\FrmLogin.Designer.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmLogin.Designer.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\FrmLogin.Designer.cs",
+              "ViewState": "AgIAAHIAAAAAAAAAAAAswIcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T14:08:48.399Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AetherAI_Form.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\AetherAI_Form.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\AetherAI_Form.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\AetherAI_Form.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\AetherAI_Form.cs",
+              "ViewState": "AgIAAMkAAAAAAAAAAAAmwO4AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T13:07:54.117Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\Program.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\Program.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\Program.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAABQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-30T19:49:16.224Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "AetherAI_Form.cs [Projeto]",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\AetherAI_Form.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\AetherAI_Form.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\AetherAI_Form.cs [Projeto]",
+              "RelativeToolTip": "RedeSnow - Manager\\AetherAI_Form.cs [Projeto]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T13:07:43.076Z",
+              "EditorCaption": " [Projeto]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "FrmAetherMsg.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmAetherMsg.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\FrmAetherMsg.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmAetherMsg.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\FrmAetherMsg.cs",
+              "ViewState": "AgIAAHQAAAAAAAAAAAAwwIkAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-08T11:32:44.857Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "FrmLogin.cs [Projeto]",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmLogin.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\FrmLogin.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmLogin.cs [Projeto]",
+              "RelativeToolTip": "RedeSnow - Manager\\FrmLogin.cs [Projeto]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T14:10:26.167Z",
+              "EditorCaption": " [Projeto]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FrmLogin.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmLogin.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\FrmLogin.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmLogin.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\FrmLogin.cs",
+              "ViewState": "AgIAAF0AAAAAAAAAAAAmwF8AAABhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-19T18:20:48.468Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "FrmInfomations.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmInfomations.Designer.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\FrmInfomations.Designer.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmInfomations.Designer.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\FrmInfomations.Designer.cs",
+              "ViewState": "AgIAALEAAAAAAAAAAAAAANUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T11:21:12Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "FrmInfomations.cs [Projeto]",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmInfomations.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\FrmInfomations.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmInfomations.cs [Projeto]",
+              "RelativeToolTip": "RedeSnow - Manager\\FrmInfomations.cs [Projeto]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T11:20:45.15Z",
+              "EditorCaption": " [Projeto]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "ThemeManager.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\ThemeManager.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\ThemeManager.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\ThemeManager.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\ThemeManager.cs",
+              "ViewState": "AgIAALUAAAAAAAAAAAAmwNoAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T10:30:01.407Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "FrmInfomations.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmInfomations.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\FrmInfomations.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FrmInfomations.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\FrmInfomations.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAwBMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T11:20:55.94Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "NetworkEngine.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\NetworkEngine.Designer.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\NetworkEngine.Designer.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\NetworkEngine.Designer.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\NetworkEngine.Designer.cs",
+              "ViewState": "AgIAAKQCAAAAAAAAAAAWwLUCAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-23T13:56:05.059Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "FormSelecao.cs [Projeto]",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FormSelecao.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\FormSelecao.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FormSelecao.cs [Projeto]",
+              "RelativeToolTip": "RedeSnow - Manager\\FormSelecao.cs [Projeto]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-23T11:22:07.763Z",
+              "EditorCaption": " [Projeto]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Aether Network",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\Aether Network.csproj",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\Aether Network.csproj",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\Aether Network.csproj",
+              "RelativeToolTip": "RedeSnow - Manager\\Aether Network.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2026-05-19T18:18:26.973Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "AetherAI.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\AetherAI.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\AetherAI.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\AetherAI.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\AetherAI.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAiwCYAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-12T12:54:44.481Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "AetherLogger.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\AetherLogger.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\AetherLogger.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\AetherLogger.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\AetherLogger.cs",
+              "ViewState": "AgIAABYAAAAAAAAAAAAgwDUAAABQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-27T11:17:34.022Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "FormSelecao.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FormSelecao.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\FormSelecao.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FormSelecao.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\FormSelecao.cs",
+              "ViewState": "AgIAAIMAAAAAAAAAAAAswMQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-23T11:22:19.531Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "FormSelecao.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FormSelecao.Designer.cs",
+              "RelativeDocumentMoniker": "RedeSnow - Manager\\FormSelecao.Designer.cs",
+              "ToolTip": "C:\\Users\\wenderson.dias\\source\\repos\\RedeSnow - Manager\\RedeSnow - Manager\\FormSelecao.Designer.cs",
+              "RelativeToolTip": "RedeSnow - Manager\\FormSelecao.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACEAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-28T11:05:51.246Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
