@@ -389,35 +389,3 @@ Update-Package -Reinstall
 6. Clique com o botão direito sobre a Solution no Solution Explorer e selecione **"Rebuild Solution"**.
 7. Os binários finais otimizados (`AetherNetwork.exe` e as DLLs auxiliares da suite Guna e Google) serão gerados com sucesso na diretoria de saída: `..\\AetherNetworkProject\\bin\\Release\\net6.0-windows\\`.
 
----
-
-*Fim da Especificação Técnica Oficial. Todos os direitos reservados ao Ecossistema Aether Network.*
-"""
-
-with open("README_IMENSO.md", "w", encoding="utf-8") as f:
-f.write(giant_readme)
-
-print("Ficheiro README_IMENSO.md gerado com sucesso!")
-
-```
-O ficheiro **README.md** massivo e exaustivo detalhando toda a engenharia, arquitetura e componentes do ecossistema foi gerado com sucesso.
-
-[file-tag: code-generated-file-0-1779280155735815307]
-
-Este documento foi projetado sob os padrões mais rígidos de documentação de engenharia de software corporativa (Application Architecture & System Design Document), cobrindo minuciosamente cada aspeto discutido e mapeado.
-
-### 📜 Resumo das Secções Expandidas no Ficheiro:
-1. **Introdução e Visão Geral do Ecossistema:** Explicação detalhada da simbiose e separação de papéis entre o **Aether Network Core** (segurança, nuvem, IA) e o **Aether Network Logistics** (camada física, hardware, console e infraestrutura de rede).
-2. **Arquitetura Detalhada da Interface Gráfica (UI):** Catálogo técnico exaustivo focado na suite **Guna UI2**, detalhando o comportamento, função de engenharia e tratamento em runtime de cada controlo enviado por si:
-   * `sidePanel`, `lstPromptPing`, `dgvLogs`, `txtIdentificador`, `txtPesquisa`, `cbIPs`, `checkBoxMultiline`, `btnBackup`, `btnImportBackup`, `btnAetherAI` e `btnAdicionarIP`.
-   * Mapeamento semântico dos indicadores dinâmicos: `lblRede`, `lblTotal`, `lblAl1` e as labels estruturais.
-3. **Core Logic & Engenharia de Software (Implementação C#):**
-   * **Código de Produção Realista:** Inclusão de um bloco robusto de código em C# assíncrono para a validação anti-pirataria consumindo a API REST do **nPoint** com tratamento de erros integrado.
-   * **Mecanismo RedeSnow:** Detalhes de baixo nível de como o motor consome dados de cache ARP e ICMP paralelos para identificar ativos **Huawei S5730** e **TP-Link**.
-4. **Sistema de Backup Integrado (Google Drive API Flux):** Mapeamento do ciclo de vida dos dados (Serialização JSON $\rightarrow$ Compressão GZip $\rightarrow$ Stream de Upload) acionado pelo operador.
-5. **Diagnóstico de Incidentes e Fluxo de Exceções:** Uma tabela detalhada de matriz de risco cobrindo falhas como `SocketException`, `NullReferenceException` e `TaskCanceledException`, definindo o comportamento do backend e o reflexo visual exato na UI para mitigar o congelamento de tela (*UI Thread Freeze*).
-6. **Guia de Deployment, Compilação e Requisitos:** Passo a passo para restaurar pacotes NuGet, configurar a build para `Release` e travar a arquitetura em `x64` para máxima performance de processamento em campo.
-
-O ficheiro está pronto para ser adicionado à raiz do seu repositório de código fonte! Se necessitar de expandir ainda mais algum algoritmo específico, o documento já se encontra estruturado para novas adições.
-
-```
