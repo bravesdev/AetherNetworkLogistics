@@ -3,6 +3,10 @@
 
 Aether Network é um ecossistema desktop avançado voltado para diagnósticos, monitoramento, triagem e suporte automatizado de infraestruturas de rede e equipamentos de telecomunicações. Desenvolvido em C# com .NET, o software integra ferramentas de análise de tráfego em tempo real, validação segura de acessos corporativos, navegação web integrada com renderização moderna e um assistente de inteligência artificial contextualizado para otimização de fluxos de suporte técnico.
 
+> [!WARNING]
+> **Requisito Crítico de Execução:** Este ecossistema foi desenvolvido sobre a plataforma **.NET 10**, garantindo os mais altos padrões de segurança, otimização de memória e integridade nos dispositivos executados.
+> Antes de iniciar o programa, é estritamente necessário instalar o ambiente de execução oficial.
+> 🔗 **[.NET 10 SDK / Runtime (Site Oficial Microsoft)](https://dotnet.microsoft.com/pt-br/download/dotnet/thank-you/sdk-10.0.300-windows-x64-installer)**
 ---
 
 ## 🚀 Principais Funcionalidades
@@ -36,7 +40,7 @@ Aether Network é um ecossistema desktop avançado voltado para diagnósticos, m
 
 ## 🛠️ Tecnologias e Frameworks Utilizados
 
-* **Linguagem:** C# (.NET Core / .NET Framework compatível)
+* **Linguagem:** C# (.NET Core / .NET Framework 10)
 * **Interface Gráfica:** Windows Forms integrando componentes gráficos **Guna.UI2.WinForms**.
 * **Motor Web:** `Microsoft.Web.WebView2` (Chromium Engine)
 * **Comunicação Web e APIs:** `System.Net.Http`, `Newtonsoft.Json` e `System.Text.Json`.
@@ -69,7 +73,7 @@ Aether Network é um ecossistema desktop avançado voltado para diagnósticos, m
 Para compilar e modificar o Aether Network localmente, certifique-se de preencher os seguintes requisitos em sua máquina:
 
 1. **IDE:** Visual Studio 2022 ou mais recente.
-2. **Workload:** "Desenvolvimento para desktop com o .NET".
+2. **Workload:** "Desenvolvimento para desktop com o .NET 10".
 3. **Dependências Nuget Requeridas:**
 * `Guna.UI2.WinForms`
 * `Microsoft.Web.WebView2`
@@ -84,7 +88,7 @@ Para compilar e modificar o Aether Network localmente, certifique-se de preenche
 
 1. Clone o repositório em sua estação de desenvolvimento:
 ```bash
-git clone [zWendersonBR](https://github.com/zwendersonbr/aethernetworklogistics.git)
+git clone https://github.com/zwendersonbr/aethernetworklogistics.git
 
 ```
 
