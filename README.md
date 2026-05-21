@@ -106,7 +106,7 @@ git clone https://github.com/zwendersonbr/aethernetworklogistics.git
 O sistema possui uma camada nativa para integridade da aplicação e proteção da equipe de suporte técnico:
 
 * **Validação por Domínio:** O ecossistema bloqueia tentativas de registro se o e-mail informado não pertencer explicitamente às regras corporativas configuradas.
-* **Protocolo de Resposta WD211:** O módulo conversacional de IA encerra de forma automática e imediata o recebimento e processamento de prompts na sessão ativa do usuário se palavras agressivas, ofensivas ou tentativas de injeção de prompt maliciosas forem detectadas, disparando um relatório automático interno. A assistente NÃO foge do ambiente de trabalho, e só responderá a duvidas técnicas.
+* O sistema trabalha de forma 100% ofiline após o primeiro acesso. Sendo assim não há necessidade de estar conectado a internet para diagnostico dos equipamentos.
 
 ---
 
