@@ -38,8 +38,8 @@ namespace aether
         private static extern Int32 SendMessage(IntPtr hWnd, int msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
         private const int EM_SETCUEBANNER = 0x1501;
         private const string CompilatedVersion = "26.5.26";
-        private const string UrlUpdate = "https://api.npoint.io/1deba0c7983047e931a3";
-        private const string UrlBlockedSystem = "https://api.npoint.io/3205904552578c16bf73";
+        private const string UrlUpdate = "api futura";
+        private const string UrlBlockedSystem = "api futura";
         private const string NomeArquivoLogs = "metadados\\screening-list.json";
         private const string ArquivoIPs = "metadados\\ping-ip.json";
         private const string ArquivoVersaoLocal = "metadados\\app-version.json";
