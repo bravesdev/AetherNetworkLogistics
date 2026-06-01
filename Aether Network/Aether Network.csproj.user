@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_LastSelectedProfileId>C:\Users\wenderson.dias\source\repos\Aether Network\Aether Network\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="Controle\Popup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Interface\Ajustes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Interface\Sora.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Interface\Selecao.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Interface\Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Interface\Navegador.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Interface\Home.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>
