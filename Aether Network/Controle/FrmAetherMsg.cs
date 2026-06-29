@@ -22,10 +22,13 @@ namespace aether.Controle
 
     public partial class FrmAetherMsg : Form
     {
-        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
-        private extern static void ReleaseCapture();
-        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
-        private extern static void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
+        [DllImport("user32.DLL")] private extern static void ReleaseCapture();
+        [DllImport("user32.DLL")] private extern static void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
+
+        // Cores Apple System (Light Mode como base)
+        private readonly Color AppleBg = Color.FromArgb(248, 248, 248);
+        private readonly Color AppleText = Color.FromArgb(28, 28, 30);
+        private readonly Color AppleBlue = Color.FromArgb(10, 132, 255);
 
         public FrmAetherMsg(string mensagem, bool isQuestion)
         {
@@ -34,90 +37,53 @@ namespace aether.Controle
 
         private void ConfigurarInterface(string mensagem, bool isQuestion)
         {
-            // --- 1. CONFIGURAÇÕES DE FONTE E MEDIÇÃO ---
-            Font fonteTexto = new Font("Segoe UI Semilight", 10);
-            Size tamanhoMaximo = new Size(500, 800); // Largura máxima de 500px
-            TextFormatFlags flags = TextFormatFlags.WordBreak | TextFormatFlags.HorizontalCenter;
+            Font fonteTexto = new Font("Segoe UI", 11, FontStyle.Regular);
+            Size tamanhoMaximo = new Size(400, 800);
+            Size tamanhoTexto = TextRenderer.MeasureText(mensagem, fonteTexto, tamanhoMaximo, TextFormatFlags.WordBreak);
 
-            // Mede o tamanho real que o texto ocupará
-            Size tamanhoTexto = TextRenderer.MeasureText(mensagem, fonteTexto, tamanhoMaximo, flags);
-
-            // --- 2. AJUSTE DINÂMICO DO FORMULÁRIO ---
-            int larguraFinal = Math.Max(420, tamanhoTexto.Width + 100);
-            int alturaFinal = tamanhoTexto.Height + 160; // Texto + Espaço do Ícone + Botões
-
-            this.Size = new Size(larguraFinal, alturaFinal);
-            this.BackColor = Color.FromArgb(10, 10, 10);
+            this.Size = new Size(420, tamanhoTexto.Height + 170);
+            this.BackColor = AppleBg;
             this.FormBorderStyle = FormBorderStyle.None;
             this.StartPosition = FormStartPosition.CenterParent;
-            this.ShowInTaskbar = false;
+            this.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, this.Width, this.Height, 20, 20));
 
-            // Arredondar cantos (GDI+)
-            this.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, this.Width, this.Height, 15, 15));
-
-            // --- 3. ÍCONE DE AVISO ---
-            PictureBox pbIcone = new PictureBox
-            {
-                Size = new Size(32, 32),
-                Location = new Point((this.Width / 2) - 16, 15),
-                SizeMode = PictureBoxSizeMode.Zoom
-            };
-            pbIcone.Paint += DesenharIcone;
-            this.Controls.Add(pbIcone);
-
-            // --- 4. LABEL DO TEXTO (DINÂMICO) ---
+            // Label de Mensagem
             Label lbl = new Label
             {
                 Text = mensagem,
                 Font = fonteTexto,
-                ForeColor = Color.FromArgb(230, 230, 230),
+                ForeColor = AppleText,
                 TextAlign = ContentAlignment.TopCenter,
-                Location = new Point(30, 60),
+                Location = new Point(30, 40),
                 Size = new Size(this.Width - 60, tamanhoTexto.Height + 20),
                 AutoSize = false
             };
             this.Controls.Add(lbl);
 
-            // --- 5. CONTAINER DE BOTÕES ---
-            Panel pnlBotoes = new Panel
-            {
-                Dock = DockStyle.Bottom,
-                Height = 70,
-                BackColor = Color.Transparent
-            };
+            // Botões Estilo Apple
+            Panel pnlBotoes = new Panel { Dock = DockStyle.Bottom, Height = 80, BackColor = Color.Transparent };
             this.Controls.Add(pnlBotoes);
 
             if (isQuestion)
             {
-                Button btnSim = CriarBotao("SIM", Color.White, Color.Black, 120);
-                Button btnNao = CriarBotao("NÃO", Color.FromArgb(30, 30, 30), Color.White, 120);
+                Button btnSim = CriarBotao("Confirmar", AppleBlue, Color.White, 120);
+                Button btnNao = CriarBotao("Cancelar", Color.FromArgb(230, 230, 230), AppleText, 120);
 
-                btnSim.Location = new Point((this.Width / 2) - 125, 15);
-                btnNao.Location = new Point((this.Width / 2) + 5, 15);
+                btnSim.Location = new Point((this.Width / 2) - 130, 20);
+                btnNao.Location = new Point((this.Width / 2) + 10, 20);
 
                 btnSim.Click += (s, e) => { this.DialogResult = DialogResult.Yes; this.Close(); };
                 btnNao.Click += (s, e) => { this.DialogResult = DialogResult.No; this.Close(); };
-
-                pnlBotoes.Controls.Add(btnSim);
-                pnlBotoes.Controls.Add(btnNao);
-                this.AcceptButton = btnSim;
+                pnlBotoes.Controls.AddRange(new Control[] { btnSim, btnNao });
             }
             else
             {
-                Button btnOk = CriarBotao("ENTENDIDO", Color.White, Color.Black, this.Width - 80);
-                btnOk.Location = new Point(40, 15);
+                Button btnOk = CriarBotao("OK", AppleBlue, Color.White, 160);
+                btnOk.Location = new Point((this.Width / 2) - 80, 20);
                 btnOk.Click += (s, e) => { this.DialogResult = DialogResult.OK; this.Close(); };
                 pnlBotoes.Controls.Add(btnOk);
-                this.AcceptButton = btnOk;
             }
 
-            // Borda externa sutil
-            this.Paint += (s, e) => {
-                using (Pen p = new Pen(Color.FromArgb(50, 50, 50), 1))
-                    e.Graphics.DrawRectangle(p, 0, 0, this.Width - 1, this.Height - 1);
-            };
-
-            // Arrastar
             this.MouseDown += (s, e) => { ReleaseCapture(); SendMessage(this.Handle, 0x112, 0xf012, 0); };
         }
 
@@ -126,30 +92,20 @@ namespace aether.Controle
             Button btn = new Button
             {
                 Text = texto,
-                Size = new Size(largura, 40),
+                Size = new Size(largura, 36),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = back,
                 ForeColor = fore,
-                Font = new Font("Segoe UI Bold", 9),
+                // CORREÇÃO: Troque "Semibold" por "Bold" ou "Regular"
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Cursor = Cursors.Hand
             };
             btn.FlatAppearance.BorderSize = 0;
+            // Efeito visual de botão arredondado simples
+            btn.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, btn.Width, btn.Height, 8, 8));
             return btn;
         }
 
-        private void DesenharIcone(object sender, PaintEventArgs e)
-        {
-            e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            using (Pen p = new Pen(Color.FromArgb(255, 180, 0), 2))
-                e.Graphics.DrawEllipse(p, 2, 2, 28, 28);
-            using (SolidBrush b = new SolidBrush(Color.FromArgb(255, 180, 0)))
-            {
-                e.Graphics.FillRectangle(b, 14, 8, 4, 10);
-                e.Graphics.FillRectangle(b, 14, 20, 4, 4);
-            }
-        }
-
-        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
-        private static extern IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse);
+        [DllImport("Gdi32.dll")] private static extern IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse);
     }
 }

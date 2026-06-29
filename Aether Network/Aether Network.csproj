@@ -7,19 +7,18 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <ApplicationIcon>icons8-teste-50.ico</ApplicationIcon>
+    <ApplicationIcon>archsisk.ico</ApplicationIcon>
     <AssemblyTitle>Aether Network</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="icons8-teste-50.ico" />
+    <Content Include="archsisk.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Guna.UI2.WinForms" Version="2.0.4.7" />
-    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3967.48" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="10.0.5" />
+    <PackageReference Include="System.DirectoryServices.AccountManagement" Version="10.0.8" />
   </ItemGroup>
 
   <ItemGroup>

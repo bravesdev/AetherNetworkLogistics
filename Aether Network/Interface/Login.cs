@@ -28,6 +28,7 @@ namespace aether
         {
             InitializeComponent();
             VincularEventosNativos();
+            ThemeManager.InitializeTheme(this);
         }
 
         private void VincularEventosNativos()
@@ -76,13 +77,13 @@ namespace aether
                 txtCode.Visible = true;
                 btnAcao.Text = "VALIDAR CÓDIGO";
                 btnAcao.Enabled = true;
-               PopupForm.Show(this, "Código enviado! Verifique sua caixa de entrada.");
+               PopupForm.Show(null, "Código enviado! Verifique sua caixa de entrada.");
             }
             else
             {
                 btnAcao.Text = "SOLICITAR ACESSO";
                 btnAcao.Enabled = true;
-                PopupForm.Show(this, "Falha ao enviar e-mail. Verifique sua conexão.");
+                PopupForm.Show(null, "Falha ao enviar e-mail. Verifique sua conexão.");
             }
         }
 
@@ -200,7 +201,7 @@ namespace aether
             }
             else
             {
-                Msg.Show("Código invalido. Verifique novamente seu codigo na caixa de email.");
+                PopupForm.Show(null,"Código invalido. Verifique novamente seu codigo na caixa de email.");
             }
         }
     }

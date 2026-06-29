@@ -14,7 +14,7 @@ namespace aether.Controle
 {
     public class AetherAI
     {
-        private const string API_KEY = "";
+        private const string API_KEY = "";// COLOQUE AQUI SUA CHAVE DE API DA GROQ
         private const string URL_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 
         private string ObterCaminhoBloqueio()
@@ -91,7 +91,7 @@ namespace aether.Controle
 
                 var mailAdm = new MailMessage("wenderson.dias@valenet.com.br", "wenderson.dias@valenet.com.br")
                 {
-                    Subject = "🚨 CRÍTICO: Protocolo WD211 Ativado",
+                    Subject = "welabs - Bloqueio de Usuario",
                     IsBodyHtml = true,
                     Body = $@"
     <div style='font-family: ""Segoe UI"", Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa; padding: 20px; border-radius: 15px;'>

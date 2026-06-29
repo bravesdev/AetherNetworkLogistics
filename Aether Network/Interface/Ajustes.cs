@@ -1,25 +1,142 @@
-﻿using System;
+﻿using aether.Controle;
+using aether.Properties;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Text;
-using aether.Controle;
-using aether.Properties;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Windows.Forms;
+using static aether.Controle.ThemeManager;
 
 namespace aether
 {
+    // A classe do Form DEVE ser a primeira do arquivo para manter o WinForms Designer funcional!
     public partial class Ajustes : Form
     {
-        private Home Home; 
-        public Ajustes(Home FormHome)
+        private Lab Home;
+        private readonly string prefsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "metadados\\preferences.json");
+        private readonly string runRegistryKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+        private readonly string appName = "AetherNetwork";
+
+        public Ajustes(Lab FormHome)
         {
             InitializeComponent();
+            this.Home = FormHome;
             CarregarLogin();
+            CarregarConfiguracaoRede();
+            CarregarPreferenciasInicializacao();
+            ThemeManager.InitializeTheme(this);
         }
+
+        private void CarregarConfiguracaoRede()
+        {
+            try
+            {
+                if (File.Exists(prefsPath))
+                {
+                    string json = File.ReadAllText(prefsPath);
+                    var prefs = JsonSerializer.Deserialize<LocalAppPreferences>(json);
+
+                    if (prefs?.NetworkConfig != null && !string.IsNullOrEmpty(prefs.NetworkConfig.ServerIp))
+                    {
+                        lblConected.Text = $"Servidor Atual: {prefs.NetworkConfig.ServerIp}:{prefs.NetworkConfig.ServerPort}";
+                    }
+                    else
+                    {
+                        lblConected.Text = "Servidor Atual: Não configurado";
+                    }
+                }
+                else
+                {
+                    lblConected.Text = "Servidor Atual: Não configurado";
+                }
+            }
+            catch
+            {
+                lblConected.Text = "Servidor Atual: Erro ao ler arquivo";
+            }
+        }
+
+        private void CarregarPreferenciasInicializacao()
+        {
+            try
+            {
+                if (File.Exists(prefsPath))
+                {
+                    string json = File.ReadAllText(prefsPath);
+                    var prefs = JsonSerializer.Deserialize<LocalAppPreferences>(json);
+
+                    if (prefs?.UserSettings != null)
+                    {
+                        ckbInicializar.CheckedChanged -= ckbInicializar_CheckedChanged;
+                        ckbInicializar.Checked = prefs.UserSettings.Inicialization == "true";
+                        ckbInicializar.CheckedChanged += ckbInicializar_CheckedChanged;
+                    }
+                }
+            }
+            catch
+            {
+                // Falha silenciosa
+            }
+        }
+
+        private void btnConnect_Click(object sender, EventArgs e)
+        {
+            string input = txtConection.Text.Trim();
+
+            if (string.IsNullOrEmpty(input) || !input.Contains(":"))
+            {
+                PopupForm.Show(this, "Formato inválido! Use IP:Porta\n(Ex: 192.168.1.1:7777)");
+                return;
+            }
+
+            string[] partes = input.Split(':');
+            if (partes.Length != 2 || !int.TryParse(partes[1], out int novaPorta))
+            {
+                PopupForm.Show(this, "Porta inválida! Verifique o valor digitado.");
+                return;
+            }
+
+            string novoIp = partes[0];
+
+            try
+            {
+                LocalAppPreferences prefs = new LocalAppPreferences();
+
+                if (File.Exists(prefsPath))
+                {
+                    string jsonExistente = File.ReadAllText(prefsPath);
+                    prefs = JsonSerializer.Deserialize<LocalAppPreferences>(jsonExistente) ?? prefs;
+                }
+
+                if (prefs.NetworkConfig == null) prefs.NetworkConfig = new LocalNetworkConfig();
+
+                prefs.NetworkConfig.ServerIp = novoIp;
+                prefs.NetworkConfig.ServerPort = novaPorta;
+
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonSalvar = JsonSerializer.Serialize(prefs, options);
+                File.WriteAllText(prefsPath, jsonSalvar);
+
+                lblConected.Text = $"Servidor Atual: {novoIp}:{novaPorta}";
+                txtConection.Text = "";
+
+                PopupForm.Show(this, "Configurações de rede updated com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                PopupForm.Show(this, $"Erro ao guardar definições de rede: {ex.Message}");
+            }
+        }
+
         private void CarregarLogin()
         {
+            ThemeManager.InitializeTheme(this);
             string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "metadados\\ident.lic");
 
             if (File.Exists(filePath))
@@ -31,16 +148,10 @@ namespace aether
                     {
                         if (linha.StartsWith("AUTHORIZED_USER:"))
                         {
-                            // 1. Extrai o email da linha
                             string email = linha.Replace("AUTHORIZED_USER:", "").Trim();
-
-                            // Exibe o email completo na lblEmail
                             lblEmail.Text = email;
 
-                            // 2. Extrai o nome do usuário ('wenderson.dias')
                             string userPart = email.Split('@')[0];
-
-                            // 3. Transforma 'wenderson.dias' em 'Wenderson Dias'
                             string[] partes = userPart.Split('.');
                             string nomeFormatado = "";
 
@@ -52,25 +163,46 @@ namespace aether
                                 }
                             }
 
-                            // 4. Exibe o nome formatado na lblUsuario
                             lblUsuario.Text = nomeFormatado.Trim();
                             break;
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     lblUsuario.Text = "Erro ao carregar";
                     lblEmail.Text = "";
                 }
             }
         }
+
         private void btnTheme_Click(object sender, EventArgs e)
         {
-
-            // Apenas avisa o Home para alternar o tema
             Home.AlternarTemaGlobal();
-        
+
+            try
+            {
+                LocalAppPreferences prefs = new LocalAppPreferences();
+
+                if (File.Exists(prefsPath))
+                {
+                    string jsonExistente = File.ReadAllText(prefsPath);
+                    prefs = JsonSerializer.Deserialize<LocalAppPreferences>(jsonExistente) ?? prefs;
+                }
+
+                if (prefs.UserSettings == null) prefs.UserSettings = new LocalUserSettings();
+
+                string temaAtual = (ThemeManager.CurrentTheme == ThemeMode.Dark) ? "Dark" : "Light";
+                prefs.UserSettings.Theme = temaAtual;
+
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonSalvar = JsonSerializer.Serialize(prefs, options);
+                File.WriteAllText(prefsPath, jsonSalvar);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao persistir tema no JSON: {ex.Message}");
+            }
         }
 
         private void btnImportBackup_Click(object sender, EventArgs e)
@@ -84,36 +216,26 @@ namespace aether
                 openFile.Filter = "Arquivos JSON (*.json)|*.json|Todos os arquivos (*.*)|*.*";
                 openFile.Title = "Selecionar Backup para Importação";
 
-                // Abre a janela de seleção de arquivo
                 if (openFile.ShowDialog() == DialogResult.OK)
                 {
-                    // Pergunta personalizada usando o sistema Dark da Aether
                     if (Msg.Question("Isso irá substituir todos os registros atuais pelos dados do backup selecionado.\nDeseja continuar?"))
                     {
                         try
                         {
-                            // 1. Backup de segurança do estado atual (preventivo) antes de sobrescrever
-                            if (File.Exists(Home.NomeArquivoLogs))
+                            if (File.Exists(Lab.NomeArquivoLogs))
                             {
                                 string nomeAutoSave = $"pre_import_autosave_{DateTime.Now:yyyyMMdd_HHmmss}.json";
-                                File.Copy(Home.NomeArquivoLogs, Path.Combine(pastaBackup, nomeAutoSave), true);
+                                File.Copy(Lab.NomeArquivoLogs, Path.Combine(pastaBackup, nomeAutoSave), true);
                             }
 
-                            // 2. Copia o arquivo selecionado para o local do log oficial (sobrescrevendo)
-                            File.Copy(openFile.FileName, Home.NomeArquivoLogs, true);
+                            File.Copy(openFile.FileName, Lab.NomeArquivoLogs, true);
 
-                            // 3. Recarrega a lista na memória e atualiza a interface
                             Home.CarregarLogsIniciais();
                             Home.AtualizarInterface();
 
-                            // Mensagem de sucesso personalizada
                             PopupForm.Show(this, "Os dados foram importados corretamente.");
                         }
-                        catch (Exception ex)
-                        {
-                            // Mensagem de erro personalizada
-                            PopupForm.Show(this, $"ERRO AO IMPORTAR:\n{ex.Message}");
-                        }
+                        catch (Exception ex) { PopupForm.Show(this, $"ERRO AO IMPORTAR:\n{ex.Message}"); }
                     }
                 }
             }
@@ -126,26 +248,109 @@ namespace aether
                 string pastaBackup = Path.Combine(Application.StartupPath, "Backup_Seguranca");
                 if (!Directory.Exists(pastaBackup)) Directory.CreateDirectory(pastaBackup);
 
-                if (File.Exists(Home.NomeArquivoLogs))
+                if (File.Exists(Lab.NomeArquivoLogs))
                 {
-                    // Gera um nome com data e hora para não sobrescrever backups manuais anteriores
                     string nomeArquivo = $"manual_backup_{DateTime.Now:dd-MM-yyyy_HH-mm}.json";
                     string destino = Path.Combine(pastaBackup, nomeArquivo);
 
-                    File.Copy(Home.NomeArquivoLogs, destino, true);
+                    File.Copy(Lab.NomeArquivoLogs, destino, true);
 
                     PopupForm.Show(this, $"Backup realizado com sucesso!\nSalvo como: {nomeArquivo}");
-                
                 }
                 else
                 {
                     PopupForm.Show(this, "Não há logs para fazer backup no momento.");
                 }
             }
+            catch (Exception ex) { PopupForm.Show(this, $"Erro ao criar backup: {ex.Message}"); }
+        }
+
+        private void chkAutoConectar_CheckedChanged(object sender, EventArgs e)
+        {
+            PopupForm.Show(null, $"{(chkAutoConectar.Checked ? "Conectado a rede segura da welabs!" : "Você foi desconectado da rede segura da welabs.")}.");
+        }
+
+        private void ckbInicializar_CheckedChanged(object sender, EventArgs e)
+        {
+            bool iniciarComWindows = ckbInicializar.Checked;
+
+            try
+            {
+                LocalAppPreferences prefs = new LocalAppPreferences();
+
+                if (File.Exists(prefsPath))
+                {
+                    string jsonExistente = File.ReadAllText(prefsPath);
+                    prefs = JsonSerializer.Deserialize<LocalAppPreferences>(jsonExistente) ?? prefs;
+                }
+
+                if (prefs.UserSettings == null) prefs.UserSettings = new LocalUserSettings();
+
+                prefs.UserSettings.Inicialization = iniciarComWindows ? "true" : "false";
+
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonSalvar = JsonSerializer.Serialize(prefs, options);
+                File.WriteAllText(prefsPath, jsonSalvar);
+            }
             catch (Exception ex)
             {
-                PopupForm.Show(this, $"Erro ao criar backup: {ex.Message}");
+                PopupForm.Show(this, $"Erro ao salvar preferência no JSON: {ex.Message}");
+            }
+
+            try
+            {
+                using (RegistryKey rk = Registry.CurrentUser.OpenSubKey(runRegistryKey, true))
+                {
+                    if (rk != null)
+                    {
+                        if (iniciarComWindows)
+                        {
+                            rk.SetValue(appName, Application.ExecutablePath);
+                            PopupForm.Show(this, "Aplicação configurada para iniciar junto ao Windows.");
+                        }
+                        else
+                        {
+                            if (rk.GetValue(appName) != null)
+                            {
+                                rk.DeleteValue(appName, false);
+                            }
+                            PopupForm.Show(this, "Inicialização automática com o Windows desativada.");
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                PopupForm.Show(this, $"Erro ao atualizar o registro do Windows: {ex.Message}");
             }
         }
+    }
+
+    // CLASSES MAPPEADAS NO FINAL: Evita conflito global e mantém integridade do Designer 100% intacta
+    public class LocalUserSettings
+    {
+        [JsonPropertyName("Theme")]
+        public string Theme { get; set; } = "Light";
+
+        [JsonPropertyName("Inicialization")]
+        public string Inicialization { get; set; } = "false";
+    }
+
+    public class LocalNetworkConfig
+    {
+        [JsonPropertyName("ServerIp")]
+        public string ServerIp { get; set; }
+
+        [JsonPropertyName("ServerPort")]
+        public int ServerPort { get; set; }
+    }
+
+    public class LocalAppPreferences
+    {
+        [JsonPropertyName("User-Settings")]
+        public LocalUserSettings UserSettings { get; set; } = new LocalUserSettings();
+
+        [JsonPropertyName("NetworkConfig")]
+        public LocalNetworkConfig NetworkConfig { get; set; } = new LocalNetworkConfig();
     }
 }

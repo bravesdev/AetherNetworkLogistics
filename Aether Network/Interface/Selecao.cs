@@ -1,29 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using aether.Controle;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using aether.Controle;
 
 namespace aether
 {
     public partial class Selecao : Form
     {
-        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
-        private extern static void ReleaseCapture();
-        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
-        private extern static void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
-        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")]
-        private static extern IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse);
+        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")] private extern static void ReleaseCapture();
+        [DllImport("user32.DLL", EntryPoint = "SendMessage")] private extern static void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
+        [DllImport("Gdi32.dll", EntryPoint = "CreateRoundRectRgn")] private static extern IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse);
 
         public class ItemDefeito
         {
             public string Codigo { get; set; }
             public string Descricao { get; set; }
-            public override string ToString() => $"{Codigo} - {Descricao}";
+            public override string ToString() => $" {Descricao}";
         }
 
         private List<ItemDefeito> listaMestra = new List<ItemDefeito> {
@@ -50,7 +45,7 @@ namespace aether
             new ItemDefeito { Codigo = "N4", Descricao = "EQUIPAMENTO ATUALIZADO PARA REDE NEUTRA, EQUIPAMENTO TESTADO E FUNCIONANDO" },
             new ItemDefeito { Codigo = "N3", Descricao = "EQUIPAMENTO COM A FIRMWARE ATUALIZADA, EQUIPAMENTO TESTADO E FUNCIONANDO" },
             new ItemDefeito { Codigo = "N2", Descricao = "EQUIPAMENTO ATUALIZADO PARA REDE NEUTRA" },
-            new ItemDefeito { Codigo = "N1", Descricao = "EQUIPAMENTO TESTADO E FUNCIONANDO" }
+            new ItemDefeito { Codigo = "N1", Descricao = "EQUIPAMENTO TESTADO E FUNCIONANDO" },
         };
 
         public List<ItemDefeito> Selecionados { get; private set; } = new List<ItemDefeito>();
@@ -59,126 +54,100 @@ namespace aether
 
         public Selecao()
         {
-            ConfigurarInterfaceCopiada();
+            ConfigurarInterfaceApple();
             CarregarListaOriginal();
         }
 
-        private void ConfigurarInterfaceCopiada()
+        private void ConfigurarInterfaceApple()
         {
-            // --- 1. CONFIGURAÇÕES IDENTICAS À SUA MSG (TAMANHO MAIOR) ---
-            this.Size = new Size(600, 700);
-            this.BackColor = Color.FromArgb(10, 10, 10);
+            // Tamanho reduzido para um formato de modal mais compacto
+            this.Size = new Size(450, 600);
+            this.BackColor = Color.FromArgb(248, 248, 248);
             this.FormBorderStyle = FormBorderStyle.None;
             this.StartPosition = FormStartPosition.CenterParent;
-            this.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, this.Width, this.Height, 15, 15));
+            this.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, this.Width, this.Height, 20, 20));
 
-            // --- 2. TÍTULO ---
+            // Título
             Label lblHeader = new Label
             {
                 Text = "SELECIONAR DIAGNÓSTICO",
-                Font = new Font("Segoe UI Bold", 9),
-                ForeColor = Color.FromArgb(150, 150, 150),
-                Location = new Point(30, 20),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold),
+                ForeColor = Color.FromArgb(100, 100, 100),
+                Location = new Point(25, 20),
                 AutoSize = true
             };
             this.Controls.Add(lblHeader);
 
-            // --- 3. TEXTBOX DE BUSCA ---
+            // Busca (ajustada para a nova largura)
             txtBusca = new TextBox
             {
-                Location = new Point(30, 50),
-                Size = new Size(this.Width - 60, 30),
-                BackColor = Color.FromArgb(25, 25, 25),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI Semilight", 11),
-                BorderStyle = BorderStyle.FixedSingle
+                Location = new Point(25, 45),
+                Size = new Size(this.Width - 50, 30),
+                BackColor = Color.White,
+                ForeColor = Color.Black,
+                Font = new Font("Segoe UI", 10),
+                BorderStyle = BorderStyle.None
             };
             txtBusca.TextChanged += (s, e) => FiltrarLista();
             this.Controls.Add(txtBusca);
 
-            // --- 4. LISTA ---
+            // Lista (proporcional ao tamanho da janela)
             clbDefeitos = new CheckedListBox
             {
-                Location = new Point(30, 100),
-                Size = new Size(this.Width - 60, 480), // Aumentado para acompanhar o form
-                BackColor = Color.FromArgb(10, 10, 10),
-                ForeColor = Color.FromArgb(200, 200, 200),
+                Location = new Point(25, 85),
+                Size = new Size(this.Width - 60, 450), // Altura ajustada
+                BackColor = Color.White,
+                ForeColor = Color.Black,
                 BorderStyle = BorderStyle.None,
-                Font = new Font("Segoe UI Semilight", 10),
-                CheckOnClick = true,
-                Cursor = Cursors.Hand
+                Font = new Font("Segoe UI", 9),
+                CheckOnClick = true
             };
             this.Controls.Add(clbDefeitos);
 
-            // --- 5. CONTAINER DE BOTÕES ---
-            Panel pnlBotoes = new Panel
-            {
-                Dock = DockStyle.Bottom,
-                Height = 80,
-                BackColor = Color.Transparent
-            };
+            // Painel Botões (mais compacto)
+            Panel pnlBotoes = new Panel { Dock = DockStyle.Bottom, Height = 60, BackColor = Color.Transparent };
             this.Controls.Add(pnlBotoes);
 
-            // Botão Confirmar (Estilo 'SIM' / 'ENTENDIDO')
-            Button btnConfirmar = CriarBotaoAether("CONFIRMAR", Color.White, Color.Black, 260);
-            btnConfirmar.Location = new Point(30, 15);
+            // Botões (largura ajustada para 180px cada)
+            Button btnConfirmar = CriarBotaoApple("CONFIRMAR", Color.FromArgb(10, 132, 255), Color.White, 180);
+            btnConfirmar.Location = new Point(25, 10);
             btnConfirmar.Click += (s, e) => ExecutarConfirmacao();
             pnlBotoes.Controls.Add(btnConfirmar);
 
-            // Botão Cancelar (Estilo 'NÃO')
-            Button btnCancelar = CriarBotaoAether("CANCELAR", Color.FromArgb(30, 30, 30), Color.White, 260);
-            btnCancelar.Location = new Point(this.Width - 290, 15);
+            Button btnCancelar = CriarBotaoApple("CANCELAR", Color.FromArgb(220, 220, 220), Color.Black, 180);
+            btnCancelar.Location = new Point(this.Width - 205, 10);
             btnCancelar.Click += (s, e) => { this.DialogResult = DialogResult.Cancel; this.Close(); };
             pnlBotoes.Controls.Add(btnCancelar);
 
-            // --- 6. PINTURA DE BORDA ---
-            this.Paint += (s, e) => {
-                using (Pen p = new Pen(Color.FromArgb(40, 40, 40), 1))
-                    e.Graphics.DrawRectangle(p, 0, 0, this.Width - 1, this.Height - 1);
-            };
-
-            // --- 7. MOVIMENTAÇÃO ---
             this.MouseDown += (s, e) => { ReleaseCapture(); SendMessage(this.Handle, 0x112, 0xf012, 0); };
-
-            this.AcceptButton = btnConfirmar;
-            this.CancelButton = btnCancelar;
         }
 
-        private Button CriarBotaoAether(string texto, Color back, Color fore, int largura)
+        private Button CriarBotaoApple(string texto, Color back, Color fore, int largura)
         {
             Button btn = new Button
             {
                 Text = texto,
-                Size = new Size(largura, 45),
+                Size = new Size(largura, 40),
                 FlatStyle = FlatStyle.Flat,
                 BackColor = back,
                 ForeColor = fore,
-                Font = new Font("Segoe UI Bold", 9),
+                // CORREÇÃO: Usar Bold ou Regular, nunca Semibold
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Cursor = Cursors.Hand
             };
             btn.FlatAppearance.BorderSize = 0;
+            btn.Region = Region.FromHrgn(CreateRoundRectRgn(0, 0, btn.Width, btn.Height, 10, 10));
             return btn;
         }
 
         private void ExecutarConfirmacao()
         {
             Selecionados = clbDefeitos.CheckedItems.Cast<ItemDefeito>().ToList();
-            if (Selecionados.Count > 0)
-            {
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
-            else
-            {
-                PopupForm.Show(this,"SELECIONE AO MENOS UM ITEM.");
-            }
+            if (Selecionados.Count > 0) { this.DialogResult = DialogResult.OK; this.Close(); }
+            else { MessageBox.Show("SELECIONE AO MENOS UM ITEM."); }
         }
 
-        private void CarregarListaOriginal()
-        {
-            clbDefeitos.Items.Clear();
-            foreach (var item in listaMestra) clbDefeitos.Items.Add(item);
-        }
+        private void CarregarListaOriginal() { foreach (var item in listaMestra) clbDefeitos.Items.Add(item); }
 
         private void FiltrarLista()
         {

@@ -2,36 +2,55 @@
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Linq;
+using System.Text.Json; // Adicionado para manipulação de JSON estruturado
+using System.Text.Json.Serialization; // Adicionado para mapear o nome com hífen
 
 namespace aether.Controle
 {
+    // --- CLASSES DE MODELAGEM DO JSON ---
+    public class UserSettings
+    {
+        [JsonPropertyName("Theme")]
+        public string Theme { get; set; } = "Light";
+    }
+
+    public class NetworkConfig
+    {
+        [JsonPropertyName("ServerIp")]
+        public string ServerIp { get; set; } = "192.168.162.12";
+
+        [JsonPropertyName("ServerPort")]
+        public int ServerPort { get; set; } = 3356;
+    }
+
+    public class AppPreferences
+    {
+        [JsonPropertyName("User-Settings")]
+        public UserSettings UserSettings { get; set; } = new UserSettings();
+
+        [JsonPropertyName("NetworkConfig")]
+        public NetworkConfig NetworkConfig { get; set; } = new NetworkConfig();
+    }
+
     // --- GERENCIADOR DE CONFIGURAÇÕES (JSON) ---
     public static class SettingsManager
     {
         private static readonly string FilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "metadados\\preferences.json");
 
-        public class UserPreferences
-        {
-            public string Theme { get; set; } = "Light";
-        }
-
         public static ThemeManager.ThemeMode LoadThemePreference()
         {
             try
             {
-                if (!File.Exists(FilePath))
+                if (File.Exists(FilePath))
                 {
-                    SaveThemePreference(ThemeManager.ThemeMode.Light);
-                    return ThemeManager.ThemeMode.Light;
-                }
+                    string json = File.ReadAllText(FilePath);
+                    var prefs = JsonSerializer.Deserialize<AppPreferences>(json);
 
-                string json = File.ReadAllText(FilePath);
-
-                // Parse manual simples para evitar dependências externas pesadas (como Newtonsoft.Json)
-                // Se você já usa Newtonsoft ou System.Text.Json no projeto, pode substituir essa linha.
-                if (json.Contains("\"Theme\": \"Dark\"") || json.Contains("\"Theme\":\"Dark\""))
-                {
-                    return ThemeManager.ThemeMode.Dark;
+                    if (prefs?.UserSettings?.Theme == "Dark")
+                    {
+                        return ThemeManager.ThemeMode.Dark;
+                    }
                 }
             }
             catch
@@ -45,9 +64,33 @@ namespace aether.Controle
         {
             try
             {
-                // Estrutura o JSON manualmente de forma limpa
-                string json = $"{{\n  \"Theme\": \"{theme}\"\n}}";
-                File.WriteAllText(FilePath, json);
+                string directory = Path.GetDirectoryName(FilePath);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                AppPreferences prefs = new AppPreferences();
+
+                // 1. Se o arquivo já existe, lê o estado atual para NÃO apagar o NetworkConfig do usuário
+                if (File.Exists(FilePath))
+                {
+                    try
+                    {
+                        string jsonExistente = File.ReadAllText(FilePath);
+                        prefs = JsonSerializer.Deserialize<AppPreferences>(jsonExistente) ?? prefs;
+                    }
+                    catch { /* Se o arquivo estiver corrompido, reinicia com o modelo padrão */ }
+                }
+
+                // 2. Atualiza apenas a propriedade do tema preservando o resto
+                if (prefs.UserSettings == null) prefs.UserSettings = new UserSettings();
+                prefs.UserSettings.Theme = theme.ToString();
+
+                // 3. Serializa de volta formatado com recuo indetado
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                string jsonSalvar = JsonSerializer.Serialize(prefs, options);
+                File.WriteAllText(FilePath, jsonSalvar);
             }
             catch (Exception ex)
             {
@@ -56,80 +99,60 @@ namespace aether.Controle
         }
     }
 
-    // --- GERENCIADOR DE TEMAS ATUALIZADO ---
+    // --- GERENCIADOR DE TEMAS ESTÁTICO (APLICA EM TUDO, SALVA E MANTÉM TODO O SEU DESIGN) ---
     public static class ThemeManager
     {
         public enum ThemeMode { Light, Dark }
-        public static ThemeMode CurrentTheme { get; private set; } = ThemeMode.Light;
+        public static ThemeMode CurrentTheme => SettingsManager.LoadThemePreference();
 
-        // --- PALETA DE CORES (AETHER NETWORK) ---
-        private static readonly Color DarkBg = Color.FromArgb(20, 26, 38);
-        private static readonly Color DarkSide = Color.FromArgb(30, 41, 59);
-        private static readonly Color DarkInput = Color.FromArgb(15, 23, 42);
-        private static readonly Color DarkText = Color.FromArgb(241, 245, 249);
-        private static readonly Color DarkBorder = Color.FromArgb(71, 85, 105);
+        // --- PALETA DE CORES DEFINITIVA: APPLE DARK MODE ---
+        private static readonly Color DarkBg = Color.FromArgb(28, 28, 30);       // System Gray 6 (Fundo Principal)
+        private static readonly Color DarkSide = Color.FromArgb(44, 44, 46);     // System Gray 5 (Paineis Elevados)
+        private static readonly Color DarkInput = Color.FromArgb(58, 58, 60);    // System Gray 4 (Inputs e TextBoxes)
+        private static readonly Color DarkText = Color.FromArgb(255, 255, 255);  // Branco Absoluto (Texto Primário)
+        private static readonly Color DarkBorder = Color.FromArgb(72, 72, 74);   // System Gray 3 (Divisores e Bordas)
 
-        private static readonly Color LightBg = Color.FromArgb(245, 247, 250);
-        private static readonly Color LightSide = Color.FromArgb(255, 255, 255);
+        // --- PALETA DE CORES DEFINITIVA: APPLE LIGHT MODE ---
+        private static readonly Color LightBg = Color.FromArgb(242, 242, 247);   // System Gray 6 (Fundo Principal Mac/iOS)
+        private static readonly Color LightSide = Color.FromArgb(255, 255, 255); // Pure White (Superfícies de Destaque)
         private static readonly Color LightInput = Color.FromArgb(255, 255, 255);
-        private static readonly Color LightText = Color.FromArgb(30, 30, 30);
-        private static readonly Color LightBorder = Color.FromArgb(209, 213, 219);
+        private static readonly Color LightText = Color.FromArgb(0, 0, 0);       // Preto Absoluto (Texto Primário)
+        private static readonly Color LightBorder = Color.FromArgb(229, 229, 234); // System Gray 5 (Divisores e Bordas)
 
-        // Variáveis de controle da animação
-        private static System.Windows.Forms.Timer transitionTimer;
-        private static double transitionProgress = 0.0;
-        private static bool isTargetDark = false;
-        private static Form activeForm;
+        // Cor de Destaque Padrão Apple para seleção (Foco de Tabelas e Itens Ativos)
+        private static readonly Color AppleAccentBlue = Color.FromArgb(10, 132, 255);
 
         /// <summary>
-        /// Inicializa o tema padrão do sistema baseado no arquivo JSON sem rodar a animação.
-        /// Chame isso no evento Load do seu Form principal.
+        /// Aplica o tema e salva no JSON. Também varre TODOS os formulários abertos e atualiza o design deles na mesma hora.
+        /// Chame isso no botão de trocar de tema.
+        /// </summary>
+        public static void ApplyAndSaveThemeToAllForms(ThemeMode theme)
+        {
+            // 1. Salva no JSON preservando outras configurações
+            SettingsManager.SaveThemePreference(theme);
+
+            // 2. Atualiza todos os formulários abertos instantaneamente
+            Form[] openForms = Application.OpenForms.Cast<Form>().ToArray();
+            bool isDark = (theme == ThemeMode.Dark);
+
+            foreach (Form frm in openForms)
+            {
+                if (frm != null && !frm.IsDisposed)
+                {
+                    RenderTransitionFrame(frm, isDark, 1.0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Aplica o tema carregado do JSON.
+        /// Chame isso no construtor de TODOS os seus formulários (logo após o InitializeComponent();)
         /// </summary>
         public static void InitializeTheme(Form form)
         {
-            CurrentTheme = SettingsManager.LoadThemePreference();
-            isTargetDark = (CurrentTheme == ThemeMode.Dark);
-
-            // Renderiza direto no frame final (progresso 1.0) para evitar lentidão ou flash na inicialização
-            RenderTransitionFrame(form, isTargetDark, 1.0);
-        }
-
-        // --- MÉTODO PRINCIPAL COM ANIMAÇÃO REAL ---
-        public static void ApplyThemeWithAnimation(Form form, ThemeMode theme)
-        {
-            // Salva a nova preferência no arquivo JSON imediatamente ao mudar
-            SettingsManager.SaveThemePreference(theme);
-
-            if (transitionTimer != null)
-            {
-                transitionTimer.Stop();
-                transitionTimer.Dispose();
-            }
-
-            CurrentTheme = theme;
-            isTargetDark = (theme == ThemeMode.Dark);
-            activeForm = form;
-            transitionProgress = 0.0;
-
-            transitionTimer = new System.Windows.Forms.Timer();
-            transitionTimer.Interval = 15; // Velocidade da atualização dos quadros (60 FPS aprox.)
-            transitionTimer.Tick += TransitionTimer_Tick;
-            transitionTimer.Start();
-        }
-
-        private static void TransitionTimer_Tick(object sender, EventArgs e)
-        {
-            transitionProgress += 0.08;
-
-            if (transitionProgress >= 1.0)
-            {
-                transitionProgress = 1.0;
-                transitionTimer.Stop();
-                transitionTimer.Dispose();
-                transitionTimer = null;
-            }
-
-            RenderTransitionFrame(activeForm, isTargetDark, transitionProgress);
+            if (form == null) return;
+            bool isDark = (CurrentTheme == ThemeMode.Dark);
+            RenderTransitionFrame(form, isDark, 1.0);
         }
 
         private static void RenderTransitionFrame(Form form, bool toDark, double progress)
@@ -145,6 +168,7 @@ namespace aether.Controle
 
         private static void ApplyFrameRecursive(Control.ControlCollection controls, bool toDark, double progress)
         {
+            Color currentBg = InterpolateColor(toDark ? LightBg : DarkBg, toDark ? DarkBg : LightBg, progress);
             Color currentSide = InterpolateColor(toDark ? LightSide : DarkSide, toDark ? DarkSide : LightSide, progress);
             Color currentInput = InterpolateColor(toDark ? LightInput : DarkInput, toDark ? DarkInput : LightInput, progress);
             Color currentText = InterpolateColor(toDark ? LightText : DarkText, toDark ? DarkText : LightText, progress);
@@ -154,7 +178,7 @@ namespace aether.Controle
             {
                 string name = c.Name;
 
-                if (name == "sidePanel")
+                if (name == "sidePanel" || name == "pnlCardAparencia" || name == "pnlCardRede" || name == "panel1" || name == "panel2" || name == "panel3")
                 {
                     SetGunaPanelColor(c, currentSide);
                 }
@@ -163,15 +187,12 @@ namespace aether.Controle
                     listBox.BackColor = currentInput;
                     listBox.ForeColor = currentText;
                 }
-               
-                else if (name == "label6" || name == "lblHorario" || name == "label7" || name == "label1" || name == "label8" ||
-                         name == "lblRede" || name == "lblTotal" || name == "lblVersion" || name == "lblAl1")
+                else if (name.StartsWith("label") || name.StartsWith("lbl"))
                 {
                     c.ForeColor = currentText;
                     if (c is Label lbl) lbl.BackColor = Color.Transparent;
                 }
-                else if ((name == "btnBackup" || name == "btnImportBackup" ||
-                          name == "btnAetherAI" || name == "btnAdicionarIP") && c is Button btn)
+                else if ((name.StartsWith("btn") || name.StartsWith("button")) && c is Button btn)
                 {
                     btn.BackColor = currentSide;
                     btn.ForeColor = currentText;
@@ -179,42 +200,37 @@ namespace aether.Controle
                     btn.FlatAppearance.BorderSize = toDark ? 0 : 1;
                     btn.FlatAppearance.BorderColor = currentBorder;
                 }
-                else if (name == "txtIdentificador" || name == "txtPesquisa")
+                else if (name == "txtIdentificador" || name == "txtPesquisa" || name == "txtEmail" || name == "txtCode" || name == "txtConection")
                 {
                     SetGunaTextBoxColor(c, currentInput, currentText, currentBorder);
                 }
-                else if (name == "cbIPs")
+                else if (name == "cbIPs" || c.GetType().Name.Contains("Guna2ComboBox"))
                 {
-                    // Acessa as propriedades via Reflection para garantir compatibilidade com Guna
                     var type = c.GetType();
 
-                    // Fundo principal do ComboBox
                     var propFill = type.GetProperty("FillColor");
                     if (propFill != null) propFill.SetValue(c, currentInput);
 
-                    // Cor do texto
                     c.ForeColor = currentText;
 
-                    // Cor do fundo da lista quando aberta
                     var propItemsBack = type.GetProperty("ItemsBackColor");
                     if (propItemsBack != null) propItemsBack.SetValue(c, currentInput);
 
-                    // Cor da borda
                     var propBorder = type.GetProperty("BorderColor");
                     if (propBorder != null) propBorder.SetValue(c, currentBorder);
                 }
-                else if (name == "checkBoxMultiline" && c is CheckBox chk)
+                else if ((name == "checkBoxMultiline" || name == "CheckedListBox" || name == "chkAutoConectar") && (c is CheckBox || c.GetType().Name.Contains("Guna2CheckBox")))
                 {
-                    chk.ForeColor = currentText;
-                    chk.BackColor = Color.Transparent;
+                    c.ForeColor = currentText;
+                    c.BackColor = Color.Transparent;
                 }
-                else if (name == "dgvLogs")
+                else if (name == "dgvLogs" || c.GetType().Name.Contains("Guna2DataGridView"))
                 {
                     if (progress >= 0.8) SetGunaDataGridViewTheme(c, toDark);
                 }
                 else if (c is Panel || c is TabControl || c is TabPage)
                 {
-                    c.BackColor = InterpolateColor(toDark ? LightBg : DarkBg, toDark ? DarkBg : LightBg, progress);
+                    c.BackColor = currentBg;
                     c.ForeColor = currentText;
                 }
 
@@ -259,10 +275,10 @@ namespace aether.Controle
             try
             {
                 Color gridBg = isDark ? DarkBg : LightBg;
-                Color rowBg = isDark ? Color.FromArgb(26, 36, 51) : Color.White;
-                Color altRowBg = isDark ? Color.FromArgb(30, 41, 59) : Color.FromArgb(245, 247, 250);
+                Color rowBg = isDark ? Color.FromArgb(44, 44, 46) : Color.White;
+                Color altRowBg = isDark ? Color.FromArgb(28, 28, 30) : Color.FromArgb(242, 242, 247);
                 Color textColor = isDark ? DarkText : LightText;
-                Color headerBg = isDark ? Color.FromArgb(15, 23, 42) : Color.FromArgb(230, 235, 240);
+                Color headerBg = isDark ? Color.FromArgb(58, 58, 60) : Color.FromArgb(229, 229, 234);
 
                 c.BackColor = gridBg;
                 if (c is DataGridView dgvNativo)
@@ -277,12 +293,12 @@ namespace aether.Controle
 
                 dgv.ThemeStyle.RowsStyle.BackColor = rowBg;
                 dgv.ThemeStyle.RowsStyle.ForeColor = textColor;
-                dgv.ThemeStyle.RowsStyle.SelectionBackColor = Color.FromArgb(37, 99, 235);
+                dgv.ThemeStyle.RowsStyle.SelectionBackColor = AppleAccentBlue;
                 dgv.ThemeStyle.RowsStyle.SelectionForeColor = Color.White;
 
                 dgv.ThemeStyle.AlternatingRowsStyle.BackColor = altRowBg;
                 dgv.ThemeStyle.AlternatingRowsStyle.ForeColor = textColor;
-                dgv.ThemeStyle.AlternatingRowsStyle.SelectionBackColor = Color.FromArgb(37, 99, 235);
+                dgv.ThemeStyle.AlternatingRowsStyle.SelectionBackColor = AppleAccentBlue;
                 dgv.ThemeStyle.AlternatingRowsStyle.SelectionForeColor = Color.White;
 
                 dgv.ThemeStyle.HeaderStyle.BackColor = headerBg;

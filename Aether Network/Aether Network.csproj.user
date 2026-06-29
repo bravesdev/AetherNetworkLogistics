@@ -7,10 +7,19 @@
     <Compile Update="Controle\Popup.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="FormAtribuicao.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="HomePage.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="Interface\Ajustes.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Interface\Sora.cs">
+    <Compile Update="Interface\Chat.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Interface\OffSystem.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Update="Interface\Selecao.cs">
@@ -19,10 +28,10 @@
     <Compile Update="Interface\Login.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Interface\Navegador.cs">
+    <Compile Update="Interface\Lab.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="Interface\Home.cs">
+    <Compile Update="Interface\Sora.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>

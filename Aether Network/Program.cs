@@ -19,11 +19,11 @@ namespace aether
             using (Mutex mutex = new Mutex(true, MutexName, out bool novaInstancia))
             {
                 // Se 'novaInstancia' for false, significa que o programa já está aberto
-                if (!novaInstancia)
+               /* if (!novaInstancia)
                 {
                     Msg.Show("O Aether Network já está em execução.");
                     return; // Encerra a nova instância imediatamente antes de carregar qualquer interface
-                }
+                }*/
 
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
@@ -37,7 +37,7 @@ namespace aether
                 // 1. Verifica se a licença já existe
                 if (File.Exists(pathLicenca))
                 {
-                    Application.Run(new Home());
+                    Application.Run(new HomePage());
                 }
                 else
                 {
@@ -50,7 +50,7 @@ namespace aether
                         if (result == DialogResult.OK)
                         {
                             // Se o login retornou OK, abre o Hub
-                            Application.Run(new Home());
+                            Application.Run(new HomePage());
                         }
                         else
                         {

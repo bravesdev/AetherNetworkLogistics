@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using System.Linq;
 using System.Threading.Tasks;
 using Guna.UI2.WinForms;
-using aether.Controle; // Certifique-se de manter a referência do Guna ativa
+using aether.Controle;
 
 namespace aether
 {
@@ -30,24 +30,36 @@ namespace aether
 
         public Sora()
         {
+            ThemeManager.InitializeTheme(this);
             InitializeComponentCustom();
             this.Load += (s, e) => AdicionarMensagemIA("Bem-vindo à Sora! Para garantir a melhor experiência, pedimos que mantenha um tom respeitoso e cordial em nossas interações. Recomendamos a leitura da nossa Política de Uso para evitar suspensões preventivas.");
         }
 
         private void InitializeComponentCustom()
         {
-            // CONFIGURAÇÃO DA JANELA PRINCIPAL (Cantos arredondados nativos do Guna sem serrilhado)
+            ThemeManager.InitializeTheme(this);
+            // CONFIGURAÇÃO DA JANELA PRINCIPAL (Cantos arredondados nativos do Guna)
             this.Size = new Size(850, 720);
             this.FormBorderStyle = FormBorderStyle.None;
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = Color.FromArgb(10, 10, 12); // Fundo ultra-dark (quase preto, moderno)
+
+            // Cores base do Ecossistema Apple Light Mode
+            Color appleBg = Color.FromArgb(242, 242, 247);          // System Gray 6 (Fundo de respiro)
+            Color appleSurface = Color.White;                       // Superfícies e Cards puros
+            Color appleTextPrimary = Color.FromArgb(0, 0, 0);       // Texto principal
+            Color appleTextSecondary = Color.FromArgb(142, 142, 147); // Texto secundário / Slate Gray alternativo
+            Color appleAccentBlue = Color.FromArgb(10, 132, 255);    // Azul Vivid Apple
+            Color appleAccentHover = Color.FromArgb(0, 115, 230);   // Azul escurecido para feedback
+            Color appleBorder = Color.FromArgb(218, 218, 222);      // Borda sutil interna
+
+            this.BackColor = appleBg;
 
             // CONTÊINER PRINCIPAL (Aplica o arredondamento perfeito na janela inteira)
             pnlMainBackground = new Guna2Panel
             {
                 Dock = DockStyle.Fill,
-                FillColor = Color.FromArgb(10, 10, 12),
-                BorderColor = Color.FromArgb(255, 51, 51), // Borda sutil na cor de destaque do seu ecossistema
+                FillColor = appleBg,
+                BorderColor = appleBorder,
                 BorderThickness = 1,
                 BorderRadius = 16
             };
@@ -58,16 +70,16 @@ namespace aether
             {
                 Dock = DockStyle.Top,
                 Height = 80,
-                FillColor = Color.FromArgb(15, 15, 18)
+                FillColor = appleSurface
             };
             pnlHeader.MouseDown += (s, e) => { ReleaseCapture(); SendMessage(this.Handle, 0x112, 0xf012, 0); };
 
             lblTitulo = new Label
             {
                 Text = "SORA // AI CORE v0.1",
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
-                ForeColor = Color.White,
-                Location = new Point(30, 26),
+                Font = new Font("SF Pro Display", 13, FontStyle.Bold), // Tipografia Apple nativa
+                ForeColor = appleTextPrimary,
+                Location = new Point(30, 28),
                 AutoSize = true,
                 BackColor = Color.Transparent
             };
@@ -77,24 +89,22 @@ namespace aether
                 Text = "EXIT",
                 Size = new Size(90, 36),
                 Location = new Point(730, 22),
-                FillColor = Color.Transparent,
-                ForeColor = Color.FromArgb(148, 163, 184), // Slate Gray
-                Font = new Font("Consolas", 9.5F, FontStyle.Bold),
-                BorderColor = Color.FromArgb(51, 65, 85),
-                BorderThickness = 1,
-                BorderRadius = 6,
-                Cursor = Cursors.Hand
+                FillColor = Color.FromArgb(239, 239, 244), // Botão secundário sutil
+                ForeColor = appleTextSecondary,
+                Font = new Font("SF Pro Text", 9F, FontStyle.Bold),
+                BorderRadius = 18, // Estilo pílula do iOS/macOS
+                Cursor = Cursors.Hand,
+                Animated = true
             };
-            btnFechar.HoverState.BorderColor = Color.FromArgb(255, 51, 51);
-            btnFechar.HoverState.FillColor = Color.FromArgb(30, 15, 15);
-            btnFechar.HoverState.ForeColor = Color.FromArgb(255, 51, 51);
+            btnFechar.HoverState.FillColor = Color.FromArgb(255, 59, 48); // Vermelho destrutivo Apple no hover
+            btnFechar.HoverState.ForeColor = Color.White;
             btnFechar.Click += (s, e) => this.Close();
 
             sepHeader = new Guna2Separator
             {
                 Location = new Point(0, 78),
                 Size = new Size(850, 2),
-                FillColor = Color.FromArgb(30, 30, 35)
+                FillColor = Color.FromArgb(229, 229, 234) // Divisor claro sutil
             };
 
             pnlHeader.Controls.Add(lblTitulo);
@@ -102,67 +112,65 @@ namespace aether
             pnlHeader.Controls.Add(sepHeader);
             pnlMainBackground.Controls.Add(pnlHeader);
 
-            // --- DISPLAY DO CHAT (RichTextBox embutido em um painel com cantos suaves)
+            // --- DISPLAY DO CHAT (RichTextBox embutido em um painel branco limpo)
             Guna2Panel pnlChatWrapper = new Guna2Panel
             {
                 Location = new Point(30, 110),
                 Size = new Size(790, 470),
-                FillColor = Color.FromArgb(15, 15, 18),
+                FillColor = appleSurface,
                 BorderRadius = 12,
                 BorderThickness = 1,
-                BorderColor = Color.FromArgb(25, 25, 30)
+                BorderColor = Color.FromArgb(229, 229, 234)
             };
 
             rtbChat = new RichTextBox
             {
                 Location = new Point(15, 15),
                 Size = new Size(760, 440),
-                BackColor = Color.FromArgb(15, 15, 18),
-                ForeColor = Color.FromArgb(226, 232, 240), // Texto claro de alta legibilidade
+                BackColor = appleSurface,
+                ForeColor = Color.FromArgb(30, 30, 30), // Escuro de alta legibilidade no fundo branco
                 BorderStyle = BorderStyle.None,
-                Font = new Font("Consolas", 11),
+                Font = new Font("SF Pro Text", 10.5F),
                 ReadOnly = true,
                 ScrollBars = RichTextBoxScrollBars.Vertical
             };
             pnlChatWrapper.Controls.Add(rtbChat);
             pnlMainBackground.Controls.Add(pnlChatWrapper);
 
-            // --- CAIXA DE ENTRADA INDUSTRIAL (Guna TextBox) ---
+            // --- CAIXA DE ENTRADA MODERNIZADA (Guna TextBox Estilo Pílula) ---
             txtInput = new Guna2TextBox
             {
                 Location = new Point(30, 605),
-                Size = new Size(645, 65),
+                Size = new Size(645, 50), // Ajustado ligeiramente para proporção visual harmoniosa
                 BackColor = Color.Transparent,
-                FillColor = Color.FromArgb(15, 15, 18),
-                BorderColor = Color.FromArgb(38, 38, 45),
+                FillColor = appleSurface,
+                BorderColor = Color.FromArgb(212, 212, 217),
                 BorderThickness = 1,
-                BorderRadius = 10,
-                Font = new Font("Consolas", 12),
-                ForeColor = Color.White,
-                PlaceholderText = "> SOLICITAR INSTRUÇÃO TÉCNICA...",
-                PlaceholderForeColor = Color.FromArgb(100, 116, 139),
+                BorderRadius = 18, // Formato arredondado iMessage
+                Font = new Font("SF Pro Text", 10.5F),
+                ForeColor = appleTextPrimary,
+                PlaceholderText = "Solicitar instrução técnica...",
+                PlaceholderForeColor = appleTextSecondary,
                 TextOffset = new Point(10, 0)
             };
-            // Efeito luminoso tecnológico ao focar na caixa de texto
-            txtInput.FocusedState.BorderColor = Color.FromArgb(255, 51, 51);
+            txtInput.FocusedState.BorderColor = appleAccentBlue;
             txtInput.KeyDown += async (s, e) => { if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; await EnviarMensagem(); } };
             pnlMainBackground.Controls.Add(txtInput);
 
-            // --- BOTÃO DE EXECUÇÃO ---
+            // --- BOTÃO DE EXECUÇÃO PRIMÁRIO ---
             btnEnviar = new Guna2Button
             {
                 Text = "EXECUTE",
-                Size = new Size(130, 65),
+                Size = new Size(130, 50),
                 Location = new Point(690, 605),
-                FillColor = Color.FromArgb(255, 51, 51), // Sua cor padrão vermelha
+                FillColor = appleAccentBlue, // Substituído o vermelho agressivo pelo Azul de Sistema
                 ForeColor = Color.White,
-                Font = new Font("Consolas", 11, FontStyle.Bold),
-                BorderRadius = 10,
+                Font = new Font("SF Pro Text", 10F, FontStyle.Bold),
+                BorderRadius = 18,
                 Cursor = Cursors.Hand,
                 Animated = true
             };
-            btnEnviar.HoverState.FillColor = Color.FromArgb(220, 38, 38); // Escurece levemente no hover
-            btnEnviar.HoverState.CustomBorderColor = Color.FromArgb(255, 100, 100);
+            btnEnviar.HoverState.FillColor = appleAccentHover;
             btnEnviar.Click += async (s, e) => await EnviarMensagem();
             pnlMainBackground.Controls.Add(btnEnviar);
         }
@@ -175,11 +183,11 @@ namespace aether
                 return;
             }
             rtbChat.SelectionStart = rtbChat.TextLength;
-            rtbChat.SelectionColor = Color.FromArgb(255, 51, 51); // Tags do sistema em Vermelho Destaque
-            rtbChat.SelectionFont = new Font("Consolas", 11, FontStyle.Bold);
+            rtbChat.SelectionColor = Color.FromArgb(10, 132, 255); // Marcação da IA em Azul Apple Accent
+            rtbChat.SelectionFont = new Font("SF Pro Text", 10.5F, FontStyle.Bold);
             rtbChat.AppendText("[SORA]: ");
-            rtbChat.SelectionColor = Color.FromArgb(226, 232, 240);
-            rtbChat.SelectionFont = new Font("Consolas", 11);
+            rtbChat.SelectionColor = Color.FromArgb(30, 30, 30);
+            rtbChat.SelectionFont = new Font("SF Pro Text", 10.5F);
             rtbChat.AppendText(texto + "\n\n");
             rtbChat.ScrollToCaret();
         }
@@ -187,11 +195,11 @@ namespace aether
         private void AdicionarMensagemUsuario(string texto)
         {
             rtbChat.SelectionStart = rtbChat.TextLength;
-            rtbChat.SelectionColor = Color.FromArgb(148, 163, 184); // Usuário em tom cinza-metálico limpo
-            rtbChat.SelectionFont = new Font("Consolas", 11, FontStyle.Bold);
+            rtbChat.SelectionColor = Color.FromArgb(142, 142, 147); // Marcação neutra em Cinza de Sistema
+            rtbChat.SelectionFont = new Font("SF Pro Text", 10.5F, FontStyle.Bold);
             rtbChat.AppendText("[USER]: ");
-            rtbChat.SelectionColor = Color.White;
-            rtbChat.SelectionFont = new Font("Consolas", 11);
+            rtbChat.SelectionColor = Color.Black;
+            rtbChat.SelectionFont = new Font("SF Pro Text", 10.5F);
             rtbChat.AppendText(texto + "\n\n");
             rtbChat.ScrollToCaret();
         }

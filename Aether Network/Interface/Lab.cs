@@ -1,26 +1,29 @@
-﻿using Microsoft.VisualBasic;
+﻿using aether;
+using aether.Controle;
+using aether.Interface;
+using aether.Properties;
+using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.DirectoryServices.AccountManagement;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
 using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Windows.Forms;
-using System.DirectoryServices.AccountManagement;
-using aether.Properties;
-using aether.Controle;
+using static aether.Controle.ThemeManager;
+using static Guna.UI2.Native.WinApi;
 
 namespace aether
 {
-    public partial class Home : Form
+    public partial class Lab : Form
     {
         // --- CONFIGURAÇÕES E CHAMADAS INICIAIS---
         [DllImport("kernel32.dll")]
@@ -34,21 +37,23 @@ namespace aether
         // Comandos de exibição
         const int SW_HIDE = 0;
         const int SW_SHOW = 5;
-
+        private Chat _instanciaChat;
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         // Comandos de exibição
         private static extern Int32 SendMessage(IntPtr hWnd, int msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)] string lParam);
         private const int EM_SETCUEBANNER = 0x1501;
-        private const string CompilatedVersion = "26.6.1";
+        private const string CompilatedVersion = "26.6.23";
         private const string UrlUpdate = "https://api.npoint.io/1deba0c7983047e931a3";
         private const string UrlBlockedSystem = "https://api.npoint.io/3205904552578c16bf73";
         public const string NomeArquivoLogs = "metadados\\screening-list.json";
         private const string ArquivoIPs = "metadados\\ping-ip.json";
         private const string ArquivoVersaoLocal = "metadados\\version.json";
         private System.Windows.Forms.Timer timerMonitorRede;
-        private long lastBytesRecebidos = 0;
-        private long lastBytesEnviados = 0;
         private Stopwatch watch = new Stopwatch();
+        private Server _athNet;
+        private Chat _athChat;
+        private List<string> _tecnicosOnline = new List<string>();
+
 
         private List<RegistroEquipamento> logsGerais = new List<RegistroEquipamento>();
         private System.Windows.Forms.Timer timerRelogio;
@@ -56,13 +61,38 @@ namespace aether
         private System.Windows.Forms.Timer timerBloq;
         private HttpClient? httpClient;
         private static readonly HttpClient _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-        public Home()
+        public Lab()
         {
 
             InitializeComponent();
 
-            PopupForm.Show(this,"Bem vindo ao Aether Network. Seus dados foram carregados!");
+            this.FormClosing += AetherClose_FormClosing;
+            _athNet = new Server(Environment.UserName);
+            _athNet.OnMensagemRecebida += (msg) =>
+            {
+ 
+                this.Invoke(new Action(() =>
+                {
+                }));
+            };
+            _athNet.Conectar();
+            _athNet.OnMensagemRecebida += (msg) =>
+            {
+                this.Invoke(new Action(() =>
+                {
+                    ProcessarTarefaRecebida(msg);
+                }));
+            };
 
+            _athNet.OnListaTecnicosRecebida += (lista) =>
+            {
+                this.Invoke(new Action(() =>
+                {
+                    _tecnicosOnline = lista; // Atualiza a variável que vai pro ComboBox
+                }));
+            };
+            _instanciaChat = new Chat();
+            dgvLogs.SelectionMode = (DataGridViewSelectionMode)SelectionMode.MultiExtended;
             ThemeManager.InitializeTheme(this);
             ConfigurarEventosInterfaceIP();
             timerMonitorRede = new System.Windows.Forms.Timer { Interval = 1000 };
@@ -85,13 +115,20 @@ namespace aether
 
             // Define os textos para os seus botões
             toolTipDinamico.SetToolTip(btnAetherAI, "Assistente de IA Sora.");
-            toolTipDinamico.SetToolTip(btnNavegador, "Navegador integrado Aether Web.");
+            toolTipDinamico.SetToolTip(btnChat, "Chat rápido.");
             toolTipDinamico.SetToolTip(btnAjustes, "Configurações do Aether Network.");
 
             this.Text = $"Aether Network v{CompilatedVersion}";
             lblVersion.Text = $"{CompilatedVersion}";
 
+            if (_athChat == null || _athChat.IsDisposed)
+            {
+                _athChat = new Chat();
+                _athChat.ExibirChat();
+            }
 
+            dgvLogs.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvLogs.MultiSelect = true; // Permite selecionar várias linhas
             dgvLogs.CellDoubleClick += DgvLogs_CellDoubleClick;
             // Registra os encodings extras (como o 850 do CMD)
             System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
@@ -99,13 +136,12 @@ namespace aether
             ConfigurarRelogio();
             ConfigurarTimerPing();
             ConfigurarLayoutPrompt();
-            TimerBloqueio();
             GerarLogsInicializacao();
             CarregarLogsIniciais();
             CarregarIPsSalvos();
             AtualizarInterface();
             SincronizarVersaoLocal();
-            VerificarAtualizacao();
+            Atualizacao();
 
             txtPesquisa.TextChanged += TxtPesquisa_TextChanged;
             txtPesquisa.PlaceholderText = "Pesquisar identificador";
@@ -128,8 +164,9 @@ namespace aether
             }
             catch { }
         }
-        private async Task VerificarAtualizacao()
+        private async Task Atualizacao()
         {
+
             try
             {
                 string json = await _httpClient.GetStringAsync(UrlUpdate);
@@ -145,6 +182,7 @@ namespace aether
 
                         if (File.Exists(updater))
                         {
+                            PopupForm.Show(this, "Iniciando atualização...");
                             Process.Start(new ProcessStartInfo
                             {
                                 FileName = updater,
@@ -157,8 +195,11 @@ namespace aether
                     }
                 }
             }
-            catch { }
+            catch { PopupForm.Show(this, $"Erro ao iniciar atualização."); }
+
         }
+
+
         private async System.Threading.Tasks.Task ExecutarVerificacoesRemotas()
         {
             // 1. Verifica Bloqueio primeiro
@@ -201,27 +242,16 @@ namespace aether
 
                         if (timerPing != null) timerPing.Stop();
 
+                        OffSystem offForm = new OffSystem();
+                        offForm.Show();
+                        this.Hide();
 
-
-                        string msgUsuario = string.IsNullOrEmpty(infoStatus.mensagem)
-
-                                            ? "O acesso a este sistema foi desativado pelo desenvolvedor."
-
-                                            : infoStatus.mensagem;
-
-
-
-                        Msg.Show(msgUsuario);
-                        Application.Exit();
-                        Environment.Exit(0); // Garante o fechamento imediato
                     }
                 }
             }
             catch
             {
-                //  Msg.Show("Aether Cloud Information\n\nOps! Parece que você está offline\n\nPrecisamos de uma conexão ativa para verificar suas permissões de acesso. Conecte-se à internet e abra o programa novamente para continuar.");
-                //  Application.Exit();
-                //  Environment.Exit(0); // Garante o fechamento imediato
+                PopupForm.Show(this, "Erro ao se concetar aos servidores. Verifique sua conexão com a internet.\nCode:11");
             }
 
 
@@ -382,17 +412,7 @@ namespace aether
         {
             lstPromptPing.Font = new Font("Consolas", 9);
         }
-        private void TimerBloqueio()
-        {
-            timerBloq = new System.Windows.Forms.Timer { Interval = 10000 };
-            timerBloq.Tick += async (s, e) =>
-            {
 
-                await ValidarStatusSistema();
-
-            };
-            timerBloq.Start();
-        }
         private void ConfigurarTimerPing()
         {
             timerPing = new System.Windows.Forms.Timer { Interval = 1000 };
@@ -464,7 +484,7 @@ namespace aether
                     catch (Exception ex)
                     {
                         // Caso falhe, usa o seu método padrão de aviso (sem botões de interrogação)
-                        PopupForm.Show(this,$"Erro ao abrir o navegador:\n{ex.Message}");
+                        PopupForm.Show(this, $"Erro ao abrir o navegador:\n{ex.Message}");
                     }
                 }
             };
@@ -535,7 +555,7 @@ namespace aether
 
             if (seriais.Count == 0)
             {
-                PopupForm.Show(this,"Nenhum identificador encontrado!");
+                PopupForm.Show(this, "Nenhum identificador encontrado!");
                 return;
             }
 
@@ -548,7 +568,7 @@ namespace aether
                     // Se for apenas um, mostra o erro e para. Se for lote, avisa e ignora o duplicado.
                     if (seriais.Count == 1)
                     {
-                        PopupForm.Show(this,$"O equipamento {id} já foi triado.");
+                        PopupForm.Show(this, $"O equipamento {id} já foi triado.");
                         txtIdentificador.Clear();
                         return;
                     }
@@ -589,7 +609,7 @@ namespace aether
 
 
                     if (seriaisValidos.Count > 1)
-                        PopupForm.Show(this,$"Sucesso! {seriaisValidos.Count} itens processados em lote.");
+                        PopupForm.Show(this, $"Sucesso! {seriaisValidos.Count} itens processados em lote.");
                 }
             }
         }
@@ -598,7 +618,7 @@ namespace aether
         {
             if (logsGerais.Count == 0)
             {
-                PopupForm.Show(this,"Não existe itens na lista para gerar um relatorio.");
+                PopupForm.Show(this, "Não existe itens na lista para gerar um relatorio.");
             }
             else
             {
@@ -607,6 +627,7 @@ namespace aether
                 string caminhoTxt = Path.Combine(Application.StartupPath, "Relatorio_Triagem.txt");
                 try
                 {
+                    PopupForm.Show(this, "Seu relatorio de triagem foi gerado!");
                     using (StreamWriter sw = new StreamWriter(caminhoTxt))
                     {
                         sw.WriteLine($"RELATÓRIO DE TESTE DE EQUIPAMENTOS AGRUPADO - {DateTime.Now:dd/MM/yyyy HH:mm}");
@@ -653,35 +674,40 @@ namespace aether
         {
             if (e.RowIndex >= 0)
             {
+
                 string serialSelecionado = dgvLogs.Rows[e.RowIndex].Cells["SERIAL"].Value.ToString();
                 var registro = logsGerais.FirstOrDefault(l => l.Identificador == serialSelecionado);
 
+                // Copia o identificador para a área de transferência automaticamente
+                Clipboard.SetText(serialSelecionado);
+
                 if (registro != null)
                 {
-                    // Formatação dos defeitos com bullets modernos
+
                     string detalhesDefeitos = string.Join(Environment.NewLine, registro.DefeitosBrutos.Select(d =>
                     {
                         var partes = d.Split('|');
                         return $"  > [{partes[0]}] {partes[1]}";
                     }));
 
-                    // Construção da String Interpolada (mais limpa)
                     string mensagem = $"FICHA TÉCNICA DO EQUIPAMENTO\n" +
                                       $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                                      $"ID: {registro.Identificador}\n" +
+                                      $"ID: {registro.Identificador} [COPIADO]\n" +
                                       $"HORÁRIO: {registro.DataHora}\n" +
                                       $"CATEGORIA: {registro.Categoria}\n" +
                                       $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
                                       $"DIAGNÓSTICO:\n{detalhesDefeitos}\n\n" +
                                       $"DESEJA ELIMINAR ESTE REGISTRO?";
 
-                    // Usando o sistema Aether Question
                     if (Msg.Question(mensagem))
                     {
                         RemoverRegistro(registro);
-                        //PopupForm.Show(this,"Registro removido com sucesso.");
+
                     }
+                    PopupForm.Show(this, $"Identificador'{registro.Identificador}' copiado para aréa de transferencia.");
+
                 }
+
             }
         }
         private void RemoverRegistro(RegistroEquipamento registro)
@@ -696,25 +722,32 @@ namespace aether
                 // Atualiza a grade (DataGridView) e o contador
                 AtualizarInterface();
 
-                PopupForm.Show(this,"Equipamento removido com sucesso!");
+                PopupForm.Show(this, "Equipamento removido com sucesso!");
             }
             catch (Exception ex)
             {
-                PopupForm.Show(this,$"Erro ao remover: {ex.Message}");
+                PopupForm.Show(this, $"Erro ao remover: {ex.Message}");
             }
         }
         private void btnLimpar_Click(object sender, EventArgs e)
         {
             {
-                // Usando seu novo sistema Dark Premium
-                if (Msg.Question("Tem certeza que deseja limpar a lista?\nNão será possível fazer o relatório após a confirmação."))
+                if (File.Exists(NomeArquivoLogs))
                 {
-                    logsGerais.Clear();
+                    if (Msg.Question("Tem certeza que deseja limpar a lista?\nNão será possível fazer o relatório após a confirmação."))
+                    {
+                        logsGerais.Clear();
 
-                    if (File.Exists(NomeArquivoLogs))
-                        File.Delete(NomeArquivoLogs);
+                        if (File.Exists(NomeArquivoLogs))
+                            File.Delete(NomeArquivoLogs);
 
-                    AtualizarInterface();
+                        AtualizarInterface();
+                        PopupForm.Show(this, "Lista limpa com sucesso!");
+                    }
+                }
+                else
+                {
+                    PopupForm.Show(this, "Não existem registros na lista.");
                 }
             }
         }
@@ -790,20 +823,97 @@ namespace aether
 
                     File.Copy(NomeArquivoLogs, destino, true);
 
-                    PopupForm.Show(this,$"Backup Manual\nBackup realizado com sucesso!\nSalvo como: {nomeArquivo}");
+                    PopupForm.Show(this, $"Backup Manual\nBackup realizado com sucesso!\nSalvo como: {nomeArquivo}");
                     LogDebug($"Backup manual criado: {nomeArquivo}");
                 }
                 else
                 {
-                    PopupForm.Show(this,"Não há logs para fazer backup no momento.");
+                    PopupForm.Show(this, "Não há logs para fazer backup no momento.");
                 }
             }
             catch (Exception ex)
             {
-                PopupForm.Show(this,$"Aviso\nErro ao criar backup: {ex.Message}");
+                PopupForm.Show(this, $"Aviso\nErro ao criar backup: {ex.Message}");
+            }
+        }
+        private void dgvLogs_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right && (ModifierKeys & Keys.Control) == Keys.Control)
+            {
+                // O SEGREDO: Força a tabela a focar para aceitar comandos de teclado (Backspace)
+                dgvLogs.Focus();
+
+                var hit = dgvLogs.HitTest(e.X, e.Y);
+                if (hit.RowIndex >= 0)
+                {
+                    dgvLogs.Rows[hit.RowIndex].Selected = !dgvLogs.Rows[hit.RowIndex].Selected;
+                }
             }
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // 1. Captura o Backspace
+            if (keyData == Keys.Back)
+            {
+                // 2. Garante que a tabela dgvLogs está focada e possui itens selecionados
+                if ((dgvLogs.ContainsFocus || dgvLogs.Focused) && dgvLogs.SelectedRows.Count > 0)
+                {
+                    string mensagemConfirmacao = $"Deseja eliminar os {dgvLogs.SelectedRows.Count} registros selecionados?";
+
+                    // Pergunta ao usuário se ele realmente deseja apagar o lote (baseado no seu Msg.Question)
+                    if (Msg.Question(mensagemConfirmacao))
+                    {
+                        try
+                        {
+                            // Lista temporária para guardar os registros que serão assassinados
+                            List<RegistroEquipamento> itensParaRemover = new List<RegistroEquipamento>();
+
+                            // Varte as linhas selecionadas na tabela
+                            foreach (DataGridViewRow linha in dgvLogs.SelectedRows)
+                            {
+                                if (!linha.IsNewRow && linha.Cells["SERIAL"].Value != null)
+                                {
+                                    string serialSelecionado = linha.Cells["SERIAL"].Value.ToString();
+
+                                    // Procura o objeto correspondente dentro da sua lista de memória logsGerais
+                                    var registro = logsGerais.FirstOrDefault(l => l.Identificador == serialSelecionado);
+
+                                    if (registro != null)
+                                    {
+                                        itensParaRemover.Add(registro);
+                                    }
+                                }
+                            }
+
+                            // Remove todos os registros encontrados da lista principal na memória
+                            foreach (var registro in itensParaRemover)
+                            {
+                                logsGerais.Remove(registro);
+                            }
+
+                            // Sincroniza com o arquivo JSON local imediatamente (idêntico ao seu RemoverRegistro)
+                            string json = JsonSerializer.Serialize(logsGerais, new JsonSerializerOptions { WriteIndented = true });
+                            File.WriteAllText(NomeArquivoLogs, json);
+
+                            // Atualiza a grade (DataGridView) e os contadores da tela
+                            AtualizarInterface();
+
+                            PopupForm.Show(this, $"{itensParaRemover.Count} equipamentos removidos com sucesso!");
+                        }
+                        catch (Exception ex)
+                        {
+                            PopupForm.Show(this, $"Erro ao remover registros em lote: {ex.Message}");
+                        }
+                    }
+
+                    // Avisa o ecossistema do Windows que a tecla Backspace foi processada com sucesso
+                    return true;
+                }
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
         private void btnImportBackup_Click(object sender, EventArgs e)
         {
             string pastaBackup = Path.Combine(Application.StartupPath, "Backup_Seguranca");
@@ -838,12 +948,12 @@ namespace aether
                             AtualizarInterface();
 
                             // Mensagem de sucesso personalizada
-                            PopupForm.Show(this,"SUCESSO!Os dados foram importados corretamente.");
+                            PopupForm.Show(this, "Os dados foram importados corretamente.");
                         }
                         catch (Exception ex)
                         {
                             // Mensagem de erro personalizada
-                            PopupForm.Show(this,$"ERRO AO IMPORTAR:\n{ex.Message}");
+                            PopupForm.Show(this, $"ERRO AO IMPORTAR:\n{ex.Message}");
                         }
                     }
                 }
@@ -871,7 +981,24 @@ namespace aether
         }
 
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            // SÓ executa a saída limpa se o chat chegou a ser criado em algum momento
+            if (_athChat != null)
+            {
+                _athChat.Desconectar();
+            }
 
+            base.OnFormClosing(e);
+        }
+        private void FormPrincipal_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Substitua 'meuChat' pelo nome da variável que você usou para instanciar o formulário Chat
+            if (_athChat != null && !_athChat.IsDisposed)
+            {
+                _athChat.Desconectar();
+            }
+        }
         private void btnAetherAI_Click(object sender, EventArgs e)
         {
 
@@ -880,13 +1007,6 @@ namespace aether
 
             // Abre como uma janela flutuante independente
             frmIA.Show();
-        }
-
-        private void btnNavegador_Click(object sender, EventArgs e)
-        {
-
-            Navegador navegador = new Navegador();
-            navegador.Show();
         }
 
         private void guna2Button1_Click(object sender, EventArgs e)
@@ -902,7 +1022,7 @@ namespace aether
                         : ThemeManager.ThemeMode.Dark;
 
             // Aplica no próprio Home
-            ThemeManager.ApplyThemeWithAnimation(this, novo);
+            ThemeManager.ApplyAndSaveThemeToAllForms(novo); // Ou Light
 
             // Se o Ajustes estiver aberto, ele já está com o tema atualizado 
             // ou você pode forçar a atualização se ele estiver referenciado
@@ -916,6 +1036,225 @@ namespace aether
 
         public class KeyConfig { public string codigo { get; set; } public string dono { get; set; } public string validade { get; set; } }
 
+        private void lblwelabs_Click(object sender, EventArgs e)
+        {
+            string url = "https://github.com/Siliconarch/";
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
+        }
 
+        private void btnChat_Click(object sender, EventArgs e)
+        {
+            if (_athChat == null || _athChat.IsDisposed)
+            {
+                _athChat = new Chat();
+            }
+
+            _athChat.ExibirChat();
+        }
+        private void btnAtribuir_Click(object sender, EventArgs e)
+        {
+            // Solicita os técnicos online (não precisamos mais checar se há algo selecionado no dgvLogs)
+            _athNet.SolicitarListaTecnicos();
+
+            // Passamos apenas a lista de técnicos para o formulário limpo
+            using (var form = new FormAtribuicao(_tecnicosOnline))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    ExecutarAtribuicaoEmLote(form);
+                }
+            }
+        }
+
+        private void ExecutarAtribuicaoEmLote(FormAtribuicao form)
+        {
+            if (form.Seriais == null || form.Seriais.Count == 0) return;
+
+            // Junta todos os seriais digitados em uma única linha separada por vírgulas
+            string seriaisAgrupados = string.Join(",", form.Seriais);
+
+            // Envia o lote inteiro em um único pacote de rede
+            _athNet.EnviarMensagem(
+                form.TecnicoSelecionado,
+                seriaisAgrupados,
+                form.Categoria,
+                form.Diagnostico,
+                form.Nota
+            );
+
+            PopupForm.Show(this, $"{form.Seriais.Count} tarefa(s) enviada(s) em lote com sucesso!");
+        }
+
+        private void ProcessarTarefaRecebida(string mensagem)
+        {
+            this.Invoke(new Action(() =>
+            {
+                // O servidor manda: TAREFA|SeriaisSeparadosPorVirgula|Categoria|Diagnostico|Nota
+                string[] partes = mensagem.Split('|');
+
+                if (partes.Length >= 5)
+                {
+                    // Separa de volta a string em uma lista de seriais reais
+                    List<string> seriaisRecebidos = partes[1].Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                                             .Select(s => s.Trim())
+                                                             .ToList();
+
+                    string categoria = partes[2].Trim();
+                    string diagnostico = partes[3].Trim();
+                    string nota = partes[4].Trim();
+
+                    DialogResult respostaDialogo = DialogResult.No;
+
+                    // Monta o texto em formato de lista estruturada para colocar na caixa Guna
+                    System.Text.StringBuilder sbItens = new System.Text.StringBuilder();
+                    sbItens.AppendLine("┌──────────────────────────────────────────┐");
+                    sbItens.AppendLine($"  CATEGORIA   : {categoria}");
+                    sbItens.AppendLine($"  DIAGNÓSTICO : {diagnostico}");
+                    sbItens.AppendLine($"  OBSERVAÇÃO  : {nota}");
+                    sbItens.AppendLine("├──────────────────────────────────────────┤");
+                    sbItens.AppendLine("  EQUIPAMENTOS NO LOTE:");
+
+                    foreach (var s in seriaisRecebidos)
+                    {
+                        sbItens.AppendLine($"  • {s}");
+                    }
+                    sbItens.AppendLine("└──────────────────────────────────────────┘");
+                    sbItens.AppendLine("\r\n Deseja assumir TODOS os equipamentos acima juntos?");
+
+                    // Caixa de Mensagem Customizada Única usando Guna
+                    using (Form formNotificacao = new Form())
+                    {
+                        formNotificacao.Text = "Aether Network - Envio de Equipamentos";
+                        formNotificacao.Size = new Size(460, 420); // Aumentado um pouco para comportar a lista
+                        formNotificacao.StartPosition = FormStartPosition.CenterParent;
+                        formNotificacao.FormBorderStyle = FormBorderStyle.FixedDialog;
+                        formNotificacao.MaximizeBox = false;
+                        formNotificacao.MinimizeBox = false;
+                        formNotificacao.BackColor = Color.FromArgb(245, 245, 245);
+                        formNotificacao.Font = new Font("Arial", 10F);
+
+                        Guna.UI2.WinForms.Guna2Panel pnlHeader = new Guna.UI2.WinForms.Guna2Panel
+                        {
+                            Size = new Size(460, 50),
+                            Location = new Point(0, 0),
+                            FillColor = Color.FromArgb(0, 102, 204),
+                        };
+
+                        Label lblTitulo = new Label
+                        {
+                            Text = $"RECEBIMENTO DE EQUIPAMENTO: {seriaisRecebidos.Count} ITENS)",
+                            Font = new Font("Arial", 11F, FontStyle.Bold),
+                            ForeColor = Color.White,
+                            Location = new Point(15, 16),
+                            AutoSize = true,
+                            BackColor = Color.Transparent
+                        };
+                        pnlHeader.Controls.Add(lblTitulo);
+
+                        Guna.UI2.WinForms.Guna2TextBox txtFicha = new Guna.UI2.WinForms.Guna2TextBox
+                        {
+                            Location = new Point(20, 70),
+                            Size = new Size(405, 220),
+                            Multiline = true,
+                            ReadOnly = true,
+                            ScrollBars = ScrollBars.Vertical,
+                            Font = new Font("Courier New", 9.5F, FontStyle.Bold),
+                            ForeColor = Color.Black,
+                            FillColor = Color.White,
+                            BorderColor = Color.FromArgb(180, 180, 180),
+                            BorderRadius = 0,
+                            Text = sbItens.ToString()
+                        };
+
+                        Guna.UI2.WinForms.Guna2Button btnAceitar = new Guna.UI2.WinForms.Guna2Button
+                        {
+                            Text = "ACEITAR EQUIPAMENTO(OS)",
+                            Size = new Size(190, 42),
+                            Location = new Point(20, 310),
+                            FillColor = Color.FromArgb(0, 128, 64),
+                            ForeColor = Color.White,
+                            Font = new Font("Arial", 9.5F, FontStyle.Bold),
+                            BorderRadius = 0,
+                            Animated = true
+                        };
+                        btnAceitar.Click += (s, e) => { respostaDialogo = DialogResult.Yes; formNotificacao.Close(); };
+
+                        Guna.UI2.WinForms.Guna2Button btnRecusar = new Guna.UI2.WinForms.Guna2Button
+                        {
+                            Text = "RECUSAR EQUIPAMENTO(0S)",
+                            Size = new Size(190, 42),
+                            Location = new Point(235, 310),
+                            FillColor = Color.FromArgb(166, 0, 0),
+                            ForeColor = Color.White,
+                            Font = new Font("Arial", 9.5F, FontStyle.Bold),
+                            BorderRadius = 0,
+                            Animated = true
+                        };
+                        btnRecusar.Click += (s, e) => { respostaDialogo = DialogResult.No; formNotificacao.Close(); };
+
+                        formNotificacao.Controls.AddRange(new Control[] { pnlHeader, txtFicha, btnAceitar, btnRecusar });
+                        formNotificacao.ShowDialog();
+                    }
+
+                    // Se aceitou, adiciona e salva todos de uma vez só
+                    if (respostaDialogo == DialogResult.Yes)
+                    {
+                        int adicionados = 0;
+                        List<string> duplicados = new List<string>();
+
+                        foreach (string serial in seriaisRecebidos)
+                        {
+                            if (SerialJaExiste(serial))
+                            {
+                                duplicados.Add(serial);
+                                continue;
+                            }
+
+                            // Adiciona na lista principal de memória
+                            logsGerais.Add(new RegistroEquipamento
+                            {
+                                Identificador = serial,
+                                DataHora = DateTime.Now.ToString("dd/MM/yyyy HH:mm"),
+                                Categoria = categoria,
+                                DefeitosBrutos = new List<string> { $"ATRIB|{diagnostico}" }
+                            });
+                            adicionados++;
+                        }
+
+                        // Se pelo menos um item foi adicionado, salva o JSON físico de uma vez só
+                        if (adicionados > 0)
+                        {
+                            File.WriteAllText(NomeArquivoLogs, System.Text.Json.JsonSerializer.Serialize(logsGerais, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+
+                            // Atualiza a tabela na tela do técnico
+                            AtualizarInterface();
+                        }
+
+                        // Feedback final resumido
+                        if (duplicados.Count > 0)
+                        {
+                            MessageBox.Show($"{adicionados} itens adicionados. {duplicados.Count} seriais foram ignorados pois já existiam na sua lista local.", "Resultado da Atribuição");
+                        }
+                        else
+                        {
+                            PopupForm.Show(null, $"{adicionados} novos equipamentos foram integrados à sua lista!");
+                        }
+                    }
+                }
+            }));
+        }
+            private void AetherClose_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _athNet.Desconectar();
+            _athChat?.Desconectar();
+            Application.Exit();
+        }
     }
-}
+    }
+  
+
+
